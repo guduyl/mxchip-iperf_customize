@@ -29,7 +29,7 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 #include "SocketUtils.h"
 
 #define tls_server_log(M, ...) custom_log("TLS", M, ##__VA_ARGS__)
@@ -74,12 +74,12 @@ DaxVdjwndTrK4UU=\r\n\
 
 void micoNotify_WifiStatusHandler( WiFiEvent event, void* const inContext )
 {
-    IPStatusTypedef para;
+    mwifi_ip_attr_t para;
     switch ( event )
     {
         case NOTIFY_STATION_UP:
-            micoWlanGetIPStatus( &para, Station );
-            tls_server_log("Server established at ip: %s port: %d",para.ip, SERVER_PORT);
+            mwifi_get_ip( &para, Station );
+            tls_server_log("Server established at ip: %s port: %d",para.localip, SERVER_PORT);
             break;
         case NOTIFY_STATION_DOWN:
             case NOTIFY_AP_UP:
@@ -88,7 +88,7 @@ void micoNotify_WifiStatusHandler( WiFiEvent event, void* const inContext )
     }
 }
 
-void tls_client_thread( mxos_thread_arg_t arg )
+void tls_client_thread( void *arg )
 {
     merr_t err = kNoErr;
     mtls_t ssl = (mtls_t) arg;
@@ -132,22 +132,23 @@ void tls_client_thread( mxos_thread_arg_t arg )
     if ( buf != NULL ) free( buf );
     SocketClose( &inSock );
     mtls_close( ssl );
-    mxos_rtos_delete_thread( NULL );
+    mos_thread_delete( NULL );
 }
 
 /* TLS server listener thread */
-void tls_server_thread( mxos_thread_arg_t arg )
+void tls_server_thread( void *arg )
 {
     UNUSED_PARAMETER( arg );
     merr_t err = kNoErr;
     struct sockaddr_in server_addr, client_addr;
     socklen_t sockaddr_t_size = sizeof(client_addr);
     char client_ip_str[16];
+    char verify_ca[16];
     int tls_listen_fd = -1, client_fd = -1;
     fd_set readfds;
     mtls_t client_ssl = NULL;
 
-    mtls_set_cert( cert_pem, key_pem );
+    mtls_set_cert( cert_pem, key_pem, verify_ca);
 
     tls_listen_fd = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
     require_action( IsValidSocket( tls_listen_fd ), exit, err = kNoResourcesErr );
@@ -201,10 +202,10 @@ void tls_server_thread( mxos_thread_arg_t arg )
     exit:
     if ( err != kNoErr ) tls_server_log( "Server listerner thread exit with err: %d", err );
     SocketClose( &tls_listen_fd );
-    mxos_rtos_delete_thread( NULL );
+    mos_thread_delete( NULL );
 }
 
-int application_start( void )
+int main( void )
 {
     merr_t err = kNoErr;
 
@@ -215,19 +216,15 @@ int application_start( void )
     require_noerr( err, exit );
 
     /* Start MiCO system functions according to mxos_config.h */
-    err = mxos_system_init( system_context_init( 0 ) );
+    err = mxos_system_init( );
     require_noerr( err, exit );
 
     /* Start TCP server listener thread*/
-    err = mxos_rtos_create_thread( NULL, MOS_APPLICATION_PRIORITY,
-                                   "TLS_server",
-                                   tls_server_thread,
-                                   0x2000,
-                                   0 );
-    require_noerr_string( err, exit, "ERROR: Unable to start the tls server thread." );
+    mos_thread_new(MOS_APPLICATION_PRIORITY, "TLS_server", tls_server_thread, 0x2000, 0 );
+
 
     exit:
-    mxos_rtos_delete_thread( NULL );
+    mos_thread_delete( NULL );
     return err;
 }
 

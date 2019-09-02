@@ -32,7 +32,7 @@
 
 #pragma once
 
-#include "mico.h"
+#include "mxos.h"
 #include "gagent_def.h"
 
 #ifdef __cplusplus

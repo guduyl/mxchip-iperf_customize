@@ -28,7 +28,7 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 #include "HTTPUtils.h"
 #include "SocketUtils.h"
 #include "StringUtils.h"
@@ -38,7 +38,7 @@
 #define REMOTE_URL "ws://10.0.1.61:8080/examples/websocket/chat"
 
 int test_ws_client(char *url);
-static mxos_semaphore_t wait_sem = NULL;
+static mos_semphr_id_t wait_sem = NULL;
 
 static void micoNotify_WifiStatusHandler( WiFiEvent status, void* const inContext )
 {
@@ -46,7 +46,7 @@ static void micoNotify_WifiStatusHandler( WiFiEvent status, void* const inContex
     switch ( status )
     {
         case NOTIFY_STATION_UP:
-            mxos_rtos_set_semaphore( &wait_sem );
+            mos_semphr_release( wait_sem );
             break;
         case NOTIFY_STATION_DOWN:
             case NOTIFY_AP_UP:
@@ -59,7 +59,7 @@ int main( void )
 {
     merr_t err = kNoErr;
 
-    mxos_rtos_init_semaphore( &wait_sem, 1 );
+    wait_sem = mos_semphr_new( 1 );
 
     /*Register user function for MiCO nitification: WiFi status changed */
     err = mxos_system_notify_register( mxos_notify_WIFI_STATUS_CHANGED,
@@ -67,11 +67,11 @@ int main( void )
     require_noerr( err, exit );
 
     /* Start MiCO system functions according to mxos_config.h */
-    err = mxos_system_init( system_context_init( 0 ) );
+    err = mxos_system_init( );
     require_noerr( err, exit );
 
     /* Wait for wlan connection*/
-    mxos_rtos_get_semaphore( &wait_sem, mxos_WAIT_FOREVER );
+    mos_semphr_acquire( wait_sem, MOS_WAIT_FOREVER );
     ws_log( "wifi connected successful" );
 
 	//ssl_set_loggingcb(ssl_log);

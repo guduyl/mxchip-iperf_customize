@@ -29,7 +29,7 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 
 #define udp_unicast_log(M, ...) custom_log("UDP", M, ##__VA_ARGS__)
 
@@ -37,12 +37,12 @@
 
 void micoNotify_WifiStatusHandler( WiFiEvent event, void* const inContext )
 {
-    IPStatusTypedef para;
+    mwifi_ip_attr_t para;
     switch ( event )
     {
         case NOTIFY_STATION_UP:
-            micoWlanGetIPStatus( &para, Station );
-            udp_unicast_log( "Wlan connected, Local ip address: %s", para.ip );
+            mwifi_get_ip( &para, Station );
+            udp_unicast_log( "Wlan connected, Local ip address: %s", para.localip );
             break;
         case NOTIFY_STATION_DOWN:
         case NOTIFY_AP_UP:
@@ -103,10 +103,10 @@ void udp_unicast_thread( void *arg )
     if ( err != kNoErr )
         udp_unicast_log("UDP thread exit with err: %d", err);
     if ( buf != NULL ) free( buf );
-    mxos_rtos_delete_thread( NULL );
+    mos_thread_delete( NULL );
 }
 
-int application_start( void )
+int main( void )
 {
     merr_t err = kNoErr;
 
@@ -116,17 +116,16 @@ int application_start( void )
     require_noerr( err, exit );
 
     /* Start MiCO system functions according to mxos_config.h */
-    err = mxos_system_init( system_context_init( 0 ) );
+    err = mxos_system_init( );
     require_noerr( err, exit );
 
-    err = mxos_rtos_create_thread( NULL, MOS_APPLICATION_PRIORITY, "udp_unicast",
-                                   (mxos_thread_function_t)udp_unicast_thread, 0x800, 0 );
-    require_noerr_string( err, exit, "ERROR: Unable to start the UDP thread." );
+    mos_thread_new(MOS_APPLICATION_PRIORITY, "udp_unicast", udp_unicast_thread, 0x800, 0 );
+ 
 
     exit:
     if ( err != kNoErr )
         udp_unicast_log("Thread exit with err: %d", err);
-    mxos_rtos_delete_thread( NULL );
+    mos_thread_delete( NULL );
     return err;
 }
 

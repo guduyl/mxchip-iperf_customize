@@ -29,11 +29,10 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 #include "mdns.h"
 
-#define QUERY_DEBUG mxos_DEBUG_ON
-#define qurey_printf(M, ...) mxos_PRINT(QUERY_DEBUG, M, ##__VA_ARGS__)
+#define qurey_printf(M, ...) custom_log("mdns", M, ##__VA_ARGS__)
 
 char service_type[]="_airplay._tcp.local";
 
@@ -71,11 +70,8 @@ int main(void)
 {
     merr_t err = kNoErr;
 
-    /* Initialize system core data */
-    mxos_Context_t *context = system_context_init( 0 );
-
     /* Initialize tcpip, Wi-Fi stacks and system functions */
-    err = mxos_system_init( context );
+    err = mxos_system_init( );
 
     /* Initialize mdns protocol and start query */
     mdns_start(NULL, DEFAULT_NAME);

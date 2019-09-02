@@ -30,7 +30,7 @@
  */
 
 #include <time.h>
-#include "mico.h"
+#include "mxos.h"
 #include "sntp.h"
 
 #define TIME_SYNC_PERIOD    (60 * SECONDS)
@@ -88,7 +88,7 @@ int main( void )
     sntp_demo_log("Current RTC Time: %s",asctime( utc_time ) );
 
     /* Start MiCO system functions according to mxos_config.h*/
-    err = mxos_system_init( system_context_init( 0 ) );
+    err = mxos_system_init( );
     require_noerr( err, exit );
 
     /* Start auto sync with NTP server */
@@ -99,7 +99,7 @@ int main( void )
     {
         mxos_time_get_iso8601_time( &iso8601_time );
         sntp_demo_log("Current time: %.26s", (char*)&iso8601_time);
-        mxos_rtos_delay_milliseconds( 10 * 1000 );
+        mos_msleep( 10 * 1000 );
     }
 
 exit:

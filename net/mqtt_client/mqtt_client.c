@@ -19,7 +19,7 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 #include "MQTTClient.h"
 
 /******************************************************
@@ -97,7 +97,7 @@ typedef struct
  *               Function Declarations
  ******************************************************/
 
-static void mqtt_client_thread( mxos_thread_arg_t arg );
+static void mqtt_client_thread( void *arg );
 static void messageArrived( MessageData* md );
 static merr_t mqtt_msg_publish( Client *c, const char* topic, char qos, char retained,
                                   const unsigned char* msg,
@@ -110,12 +110,12 @@ merr_t user_recv_handler( void *arg );
  *               Variables Definitions
  ******************************************************/
 
-mxos_queue_t   mqtt_msg_send_queue = NULL;
+mos_queue_id_t   mqtt_msg_send_queue = NULL;
 
 Client c;  // mqtt client object
 Network n;  // socket network for mqtt client
 
-static mxos_worker_thread_t  mqtt_client_worker_thread; /* Worker thread to manage send/recv events */
+static mos_worker_thread_id_t  mqtt_client_worker_thread; /* Worker thread to manage send/recv events */
 static mos_worker_timed_event_t   mqtt_client_send_event;
 
 /******************************************************
@@ -123,9 +123,8 @@ static mos_worker_timed_event_t   mqtt_client_send_event;
  ******************************************************/
 
 /* Application entrance */
-merr_t application_start( void *arg )
+int main(void)
 {
-    UNUSED_PARAMETER( arg );
     merr_t err = kNoErr;
     mxos_Context_t* mxos_context = NULL;
 
@@ -138,22 +137,16 @@ merr_t application_start( void *arg )
     app_log( "MQTT client version: [%ld.%ld.%ld]",
              0xFF & (mqtt_lib_version >> 16), 0xFF & (mqtt_lib_version >> 8), 0xFF & mqtt_lib_version);
 
-    /* Create mico system context and read application's config data from flash */
-    mxos_context = system_context_init( 0 );
-
     /* mico system initialize */
-    err = mxos_system_init( mxos_context );
+    err = mxos_system_init( );
     require_noerr( err, exit );
 
     /* create mqtt msg send queue */
-    err = mxos_rtos_init_queue( &mqtt_msg_send_queue, "mqtt_msg_send_queue", sizeof(p_mqtt_send_msg_t),
-                                MAX_MQTT_SEND_QUEUE_SIZE );
-    require_noerr_action( err, exit, app_log("ERROR: create mqtt msg send queue err=%d.", err) );
+    mqtt_msg_send_queue = mos_queue_new(sizeof(p_mqtt_send_msg_t), MAX_MQTT_SEND_QUEUE_SIZE );
 
     /* start mqtt client */
-    err = mxos_rtos_create_thread( NULL, MOS_APPLICATION_PRIORITY, "mqtt_client",
-                                   (mxos_thread_function_t)mqtt_client_thread, mqtt_thread_stack_size, 0 );
-    require_noerr_string( err, exit, "ERROR: Unable to start the mqtt client thread." );
+    mos_thread_new(MOS_APPLICATION_PRIORITY, "mqtt_client", mqtt_client_thread, mqtt_thread_stack_size, 0 );
+    
 
     /* Create a worker thread for user handling MQTT data event  */
     err = mxos_rtos_create_worker_thread( &mqtt_client_worker_thread, MOS_APPLICATION_PRIORITY, 0x800, 5 );
@@ -213,7 +206,7 @@ exit:
     return err;
 }
 
-void mqtt_client_thread( mxos_thread_arg_t arg )
+void mqtt_client_thread( void *arg )
 {
     merr_t err = kUnknownErr;
 
@@ -308,7 +301,7 @@ MQTT_start:
             while ( mxos_rtos_is_queue_empty( &mqtt_msg_send_queue ) == false )
             {
                 // get msg from send queue
-                mxos_rtos_pop_from_queue( &mqtt_msg_send_queue, &p_send_msg, 0 );
+                mos_queue_pop( &mqtt_msg_send_queue, &p_send_msg, 0 );
                 require_string( p_send_msg, exit, "Wrong data point");
 
                 // send message to server
@@ -342,7 +335,7 @@ MQTT_reconnect:
 exit:
     mqtt_log("EXIT: MQTT client exit with err = %d.", err);
     mqtt_client_release( &c, &n);
-    mxos_rtos_delete_thread( NULL );
+    mos_thread_delete( NULL );
 }
 
 // callback, msg received from mqtt server
@@ -358,7 +351,7 @@ static void messageArrived( MessageData* md )
      (int)message->payloadlen,
      (char*)message->payload);
      */
-    mqtt_log("\t\t\t\t\t======MQTT received callback ![%d]======", MicoGetMemoryInfo()->free_memory );
+    mqtt_log("\t\t\t\t\t======MQTT received callback ![%d]======", mos_mallinfo()->free );
 
     p_recv_msg = (p_mqtt_recv_msg_t) calloc( 1, sizeof(mqtt_recv_msg_t) );
     require_action( p_recv_msg, exit, err = kNoMemoryErr );
@@ -401,11 +394,11 @@ merr_t user_send_handler( void *arg )
     merr_t err = kUnknownErr;
     p_mqtt_send_msg_t p_send_msg = NULL;
 
-    app_log("======App prepare to send ![%d]======", MicoGetMemoryInfo()->free_memory);
+    app_log("======App prepare to send ![%d]======", mos_mallinfo()->free);
 
     /* Send queue is full, pop the oldest */
     if ( mxos_rtos_is_queue_full( &mqtt_msg_send_queue ) == true ){
-        mxos_rtos_pop_from_queue( &mqtt_msg_send_queue, &p_send_msg, 0 );
+        mos_queue_pop( &mqtt_msg_send_queue, &p_send_msg, 0 );
         free( p_send_msg );
         p_send_msg = NULL;
     }
@@ -420,7 +413,7 @@ merr_t user_send_handler( void *arg )
     memcpy( p_send_msg->data, MQTT_CLIENT_PUB_MSG, p_send_msg->datalen );
     strncpy( p_send_msg->topic, MQTT_CLIENT_PUB_TOPIC, MAX_MQTT_TOPIC_SIZE );
 
-    err = mxos_rtos_push_to_queue( &mqtt_msg_send_queue, &p_send_msg, 0 );
+    err = mos_queue_push( &mqtt_msg_send_queue, &p_send_msg, 0 );
     require_noerr( err, exit );
 
     app_log("Push user msg into send queue success!");

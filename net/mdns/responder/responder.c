@@ -29,7 +29,7 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 #include "mdns.h"
 
 struct mdns_service demo_service;
@@ -39,11 +39,8 @@ int main(void)
 {
     merr_t err = kNoErr;
 
-    /* Initialize system core data */
-    mxos_Context_t *context = system_context_init( 0 );
-
     /* Initialize tcpip, Wi-Fi stacks and system functions */
-    err = mxos_system_init( context );
+    err = mxos_system_init( );
 
     /* Initialize mdns protocol and add a service*/
     memset(&demo_service, 0x0, sizeof(demo_service));

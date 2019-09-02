@@ -30,7 +30,7 @@
  ******************************************************************************
  **/
 
-#include "mico.h"
+#include "mxos.h"
 #include "CheckSumUtils.h"
 #include "user_defines.h"   
 #include "gagent.h"

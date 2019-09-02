@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include "mico.h"
+#include "mxos.h"
 #include "smtpclient.h"
 
 typedef unsigned char byte;
@@ -70,7 +70,7 @@ typedef unsigned char byte;
 #define SMTP_RCV_END            SMTP_CRLF
 #define SMTP_RCV_ESMTP          ("ESMTP")
 #define SMTP_RCV_SMTP           ("SMTP")
-#define SMTP_RCV_SERVOK         ("220")     // 220 �������
+#define SMTP_RCV_SERVOK         ("220")     // 220 �������?
 #define SMTP_RCV_HELO           ("250")     // 250 Ҫ����ʼ��������
 
 #define SMTP_RCV_EHLO           ("250")     // 250 Ҫ����ʼ��������
@@ -84,9 +84,9 @@ typedef unsigned char byte;
 #define SMTP_RCV_SEND_END       ("250")
 #define SMTP_RCV_RSET           ("250")
 #define SMTP_RCV_NOOP           ("250")
-#define SMTP_RCV_QUIT           ("221")     // 221 ����رմ����ŵ�
+#define SMTP_RCV_QUIT           ("221")     // 221 ����رմ����ŵ�?
 
-#define SMTP_SEND_BLOCK_SIZE    (1024)      // ÿ�η����ż����ݵĿ�Ĵ�С
+#define SMTP_SEND_BLOCK_SIZE    (1024)      // ÿ�η����ż����ݵĿ�Ĵ��?
 
 #define SMTP_APPEND_TO_MAX 8
 
@@ -352,7 +352,7 @@ static int Base64Encode(char *paInput, char *paOutput, int *iCount)
 }
 
 // strlen(paInput)/strlen(paOutput) = 4/3
-mxos_UNUSED static int Base64Decode(char *paInput, char *paOutput)
+static int Base64Decode(char *paInput, char *paOutput)
 {
     int i;
     char caFour[4] = {0}, *p = NULL, *q = NULL;
@@ -391,7 +391,7 @@ mxos_UNUSED static int Base64Decode(char *paInput, char *paOutput)
     return 0;
 }
 
-mxos_UNUSED static int MimeEncodeHeader(const char *charset, char *header)
+static int MimeEncodeHeader(const char *charset, char *header)
 {
     static const char defaultCharset[] = "gb2312";
     char strtmp[LINE_LEN];

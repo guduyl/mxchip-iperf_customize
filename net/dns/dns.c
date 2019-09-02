@@ -29,7 +29,7 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 
 #define dns_log(M, ...) custom_log("DNS", M, ##__VA_ARGS__)
 
@@ -45,7 +45,7 @@ int main( void )
     //mxos_network_switch_interface_manual(INTERFACE_ETH);
     
     /* Start MiCO system functions according to mxos_config.h*/
-    err = mxos_system_init( system_context_init( 0 ) );
+    err = mxos_system_init( );
     require_noerr( err, exit );
     
     while ( 1 ) {
@@ -59,7 +59,7 @@ int main( void )
             in_addr.s_addr = *(uint32_t *) (*pptr);
             dns_log( "%s ip address: %s", domain, inet_ntoa(in_addr));
         }
-        mxos_rtos_delay_milliseconds( 2000 );
+        mos_msleep( 2000 );
     }
 
 exit:

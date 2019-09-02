@@ -54,7 +54,7 @@
  #ifndef _SMTPCLIENT_H
  #define _SMTPCLIENT_H
 
-#include <mico.h>
+#include <mxos.h>
 
  #ifdef   __cplusplus
  extern "C" {
@@ -107,7 +107,7 @@ struct SMTP_S {
     int  sentlines;                 //�ѷ��͵�����
     int  recvsize;                  //�ѽ��յ����ݴ�С
     int  recvlines;                 //�ѽ��յ�����
-    int  errcode;                   //�������������
+    int  errcode;                   //�������������?
     char errinfo[64];             //��������Ϣ
     char smtpcmd[32];               //���͵�SMTPЭ������
     char smtprcv[32];               //��ȡ��SMTPЭ����
@@ -123,7 +123,7 @@ typedef struct SMTP_S SMTP;         //SMTP�ṹ����
 SMTP* SmtpInit(char *server, uint16_t port, const char *psender, 
       const char *puser, const char *ppasswd);
 
-// ��ӳ������ʼ���ַ����
+// ��ӳ������ʼ���ַ����?
 // ���룺psmtp ���Žṹ��pemail �ʼ���ַ
 // ���أ�0 �ɹ�����0 ʧ��
 int SmtpAddCc(SMTP *psmtp, const char *pemail);
@@ -133,7 +133,7 @@ int SmtpAddCc(SMTP *psmtp, const char *pemail);
 // ���أ�0 �ɹ�����0 ʧ��
 int SmtpRemoveCc(SMTP *psmtp, const char *pemail);
 
-// ��ӽ������ʼ���ַ����
+// ��ӽ������ʼ���ַ����?
 // ���룺psmtp ���Žṹ��pemail �ʼ���ַ
 // ���أ�0 �ɹ�����0 ʧ��
 int SmtpAddTo(SMTP *psmtp, const char *pemail);
@@ -144,7 +144,7 @@ int SmtpRemoveTo(SMTP *psmtp, const char *pemail);
 
 void SmtpSetSSLMode(SMTP *psmtp, uint8_t mode);
 
-// ���ź���������������ӡ���֤�����źͶϿ���ȫ������
+// ���ź���������������ӡ���֤�����źͶϿ����?������
 // ���룺psmtp ���Žṹ
 // ���أ�0 �ɹ�����0 ʧ��
 // psmtp->errcode psmtp->errinfo���ش�������Ϣ

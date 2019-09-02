@@ -28,8 +28,7 @@
 
 #include "libwebsockets.h"
 
-#define LWS_DEMO_DEBUG mxos_DEBUG_ON
-#define lws_demo_log(M, ...) mxos_LOG(LWS_DEMO_DEBUG, "CHAT", M, ##__VA_ARGS__)
+#define lws_demo_log(M, ...) custom_log("TCP", M, ##__VA_ARGS__)
 
 static int deny_deflate, test_post;
 static struct lws *wsi_demo;

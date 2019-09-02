@@ -31,15 +31,15 @@
  ******************************************************************************
  */
 
-#include "mico.h" 
+#include "mxos.h" 
 #include "app_httpd.h"
 
 #define http_server_log(format, ...)  custom_log("httpserver", format, ##__VA_ARGS__)
 
-int application_start( void )
+int main( void )
 {
   /* Start MiCO system functions according to mxos_config.h*/
-  mxos_system_init( system_context_init( 0 ) );
+  mxos_system_init( );
   
   /* Output on debug serial port */
   http_server_log( "http server Demo!" );
@@ -47,7 +47,7 @@ int application_start( void )
   /* start http server thread */
   app_httpd_start();
   
-  mxos_rtos_delete_thread( NULL );
+  mos_thread_delete( NULL );
   return kNoErr;
 }
 

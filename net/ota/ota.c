@@ -29,19 +29,19 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 #include "ota_server.h"
 
 #define ota_log(M, ...) custom_log("OTA", M, ##__VA_ARGS__)
 
-static mxos_semaphore_t wait_sem = NULL;
+static mos_semphr_id_t wait_sem = NULL;
 
 static void micoNotify_WifiStatusHandler( WiFiEvent status, void* const inContext )
 {
     switch ( status )
     {
         case NOTIFY_STATION_UP:
-            mxos_rtos_set_semaphore( &wait_sem );
+            mos_semphr_release( wait_sem );
             break;
          default:
             break;
@@ -103,7 +103,7 @@ int main( void )
 {
     merr_t err = kNoErr;
 
-    mxos_rtos_init_semaphore( &wait_sem, 1 );
+    wait_sem = mos_semphr_new( 1 );
 
     /*Register user function for MiCO nitification: WiFi status changed */
     err = mxos_system_notify_register( mxos_notify_WIFI_STATUS_CHANGED,
@@ -112,11 +112,11 @@ int main( void )
     require_noerr( err, exit );
 
     /* Start MiCO system functions according to mxos_config.h*/
-    err = mxos_system_init( system_context_init( 0 ) );
+    err = mxos_system_init( );
     require_noerr( err, exit );
 
     /* Wait for wlan connection*/
-    mxos_rtos_get_semaphore( &wait_sem, mxos_WAIT_FOREVER );
+    mos_semphr_acquire( wait_sem, MOS_WAIT_FOREVER );
     ota_log( "wifi connected successful, input \"help\" for useful commands." );
 
     cli_register_commands(ota_clis, sizeof(ota_clis)/sizeof(struct cli_command));

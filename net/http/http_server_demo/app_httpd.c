@@ -34,7 +34,7 @@
 #include <http_parse.h>
 #include <http-strings.h>
 
-#include "mico.h"
+#include "mxos.h"
 #include "httpd_priv.h"
 #include "app_httpd.h"
 
@@ -82,20 +82,20 @@ static int web_send_result_page(httpd_request_t *req)
   if(!strncmp(value_ssid, "\0", 1))
     goto Save_Out;
   
-  strncpy(context->micoSystemConfig.ssid, value_ssid, maxSsidLen);
+  strncpy(context->mxos_config.ssid, value_ssid, maxSsidLen);
   
   err = httpd_get_tag_from_post_data(buf, "PASS", value_pass, maxKeyLen);
   require_noerr( err, Save_Out );
   
-  strncpy(context->micoSystemConfig.key, value_pass, maxKeyLen);
-  strncpy(context->micoSystemConfig.user_key, value_pass, maxKeyLen);
-  context->micoSystemConfig.keyLength = strlen(context->micoSystemConfig.key);
-  context->micoSystemConfig.user_keyLength = strlen(context->micoSystemConfig.key);
+  strncpy(context->mxos_config.key, value_pass, maxKeyLen);
+  strncpy(context->mxos_config.user_key, value_pass, maxKeyLen);
+  context->mxos_config.keyLength = strlen(context->mxos_config.key);
+  context->mxos_config.user_keyLength = strlen(context->mxos_config.key);
   
-  context->micoSystemConfig.channel = 0;
-  memset(context->micoSystemConfig.bssid, 0x0, 6);
-  context->micoSystemConfig.security = SECURITY_TYPE_AUTO;
-  context->micoSystemConfig.dhcpEnable = true;
+  context->mxos_config.channel = 0;
+  memset(context->mxos_config.bssid, 0x0, 6);
+  context->mxos_config.security = SECURITY_TYPE_AUTO;
+  context->mxos_config.dhcpEnable = true;
   
   para_succ = true;
   
@@ -109,7 +109,7 @@ Save_Out:
     err = httpd_send_body(req->sock, wifisuccess, sizeof(wifisuccess));
     require_noerr_action( err, exit, app_httpd_log("ERROR: Unable to send http wifisuccess body.") );
     
-    context->micoSystemConfig.configured = allConfigured;
+    context->mxos_config.configured = allConfigured;
     
     mxos_system_context_update(context);
     
