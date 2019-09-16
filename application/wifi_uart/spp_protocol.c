@@ -58,12 +58,11 @@ merr_t sppWlanCommandProcess(unsigned char *inBuf, int *inBufLen, int inSocketFd
 {
   UNUSED_PARAMETER(inSocketFd);
   UNUSED_PARAMETER(inContext);
-  merr_t err = kUnknownErr;
 
-  err = mhal_uart_write(MXOS_APP_UART, inBuf, *inBufLen);
+  mhal_uart_write(MXOS_APP_UART, inBuf, *inBufLen);
 
   *inBufLen = 0;
-  return err;
+  return kNoErr;
 }
 
 merr_t sppUartCommandProcess(uint8_t *inBuf, int inLen, app_context_t * const inContext)
