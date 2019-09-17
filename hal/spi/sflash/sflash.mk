@@ -24,6 +24,6 @@
 
 NAME := SFLASH
 
-$(NAME)_SOURCES := main.c sflash.c
+$(NAME)_SOURCES := main.c sflash.c sflash_mxos.c
 
 $(NAME)_CFLAGS := -Wno-unused-function

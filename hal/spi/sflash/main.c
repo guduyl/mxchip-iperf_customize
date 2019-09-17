@@ -59,28 +59,7 @@ const flash_vendor_t flash_vendor_list[] = {
 static uint8_t wdata[FLASH_TEST_SIZE];
 static uint8_t rdata[FLASH_TEST_SIZE];
 
-static void dumphex(uint8_t *buf, uint32_t len)
-{
-  printf("Dumped flash data:\r\n");
-  printf("-----------------------------------------------------");
-  for (int i = 0; i < len; i++)
-  {
-    if (i % 16 == 0)
-    {
-      printf("\r\n%04X: ", i);
-    }
-    printf("%02X ", buf[i]);
-  }
-  printf("\r\n");
-  printf("-----------------------------------------------------");
-  printf("\r\n");
-}
-
-static void dump_flashdata(void)
-{
-  sFlash_Read(FLASH_TEST_ADDR, rdata, FLASH_TEST_SIZE);
-  dumphex(rdata, FLASH_TEST_SIZE);
-}
+static void dump_flashdata(void);
 
 int main(void)
 {
@@ -140,29 +119,25 @@ int main(void)
   return 0;
 }
 
-void sFlash_DelayMs(uint32_t ms)
+static void dumphex(uint8_t *buf, uint32_t len)
 {
-  mos_msleep(ms);
+  printf("Dumped flash data:\r\n");
+  printf("-----------------------------------------------------");
+  for (int i = 0; i < len; i++)
+  {
+    if (i % 16 == 0)
+    {
+      printf("\r\n%04X: ", i);
+    }
+    printf("%02X ", buf[i]);
+  }
+  printf("\r\n");
+  printf("-----------------------------------------------------");
+  printf("\r\n");
 }
 
-void sFlash_Command(uint8_t cmd, uint8_t *arg, uint32_t argc, uint8_t *buf, uint32_t n, sFlashDir_t dir)
+static void dump_flashdata(void)
 {
-  mhal_gpio_low(MXKIT_CS);
-  mhal_spi_write_and_read(MXKIT_SPI, &cmd, NULL, 1);
-  if (arg && argc > 0)
-  {
-    mhal_spi_write_and_read(MXKIT_SPI, arg, NULL, argc);
-  }
-  if (buf && n > 0)
-  {
-    if (dir == DIR_W)
-    {
-      mhal_spi_write_and_read(MXKIT_SPI, buf, NULL, n);
-    }
-    else
-    {
-      mhal_spi_write_and_read(MXKIT_SPI, NULL, buf, n);
-    }
-  }
-  mhal_gpio_high(MXKIT_CS);
+  sFlash_Read(FLASH_TEST_ADDR, rdata, FLASH_TEST_SIZE);
+  dumphex(rdata, FLASH_TEST_SIZE);
 }
