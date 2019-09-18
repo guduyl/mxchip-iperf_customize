@@ -123,7 +123,7 @@ merr_t apds9930_sensor_init(void);
  * @return   kNoErr        : on success.
  * @return   kGeneralErr   : if an error occurred
  */
-merr_t apds9930_sensor_deinit(void);
+void apds9930_sensor_deinit(void);
 
 /**
  * @brief  Read data from ADPS9930  device  .

@@ -153,7 +153,7 @@ exit:
   return err;
 }
 
-merr_t apds9930_sensor_deinit(void)
+void apds9930_sensor_deinit(void)
 {
   return mhal_i2c_close(MXKIT_I2C);
 }
