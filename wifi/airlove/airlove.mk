@@ -22,8 +22,8 @@
 ############################################################################### 
 
 
-NAME := App_wifi_softap
+NAME := AIRLOVE
 
-$(NAME)_SOURCES := main.c
+$(NAME)_SOURCES := main.c 80211sim.c
 				      
 

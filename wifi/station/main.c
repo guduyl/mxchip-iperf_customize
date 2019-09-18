@@ -1,31 +1,10 @@
 /**
  ******************************************************************************
- * @file    wifi_station.c
- * @author  William Xu
+ * @file    main.c
+ * @author  Snow Yang
  * @version V1.0.0
- * @date    21-May-2015
- * @brief   Connect to access point using core MiCO wlan APIs
- ******************************************************************************
- *
- *  The MIT License
- *  Copyright (c) 2014 MXCHIP Inc.
- *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is furnished
- *  to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
- *  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * @date    21-May-2019
+ * @brief   Wi-Fi station demo.
  ******************************************************************************
  */
 
@@ -36,17 +15,32 @@
 #define SSID "snowyang"
 #define PASSPHRASE "mxchip123"
 
+void wifi_status_notify(int event, void *arg);
+
 int main(void)
 {
+  /* Initialize network(Wi-Fi, TCP/IP) */
   mxos_network_init();
 
-  /* Connect Now! */
+  /* Register Wi-Fi status notification */
+  mxos_system_notify_register(mxos_notify_WIFI_STATUS_CHANGED, wifi_status_notify, NULL);
+
   app_log("connecting to %s...", SSID);
+  /* Connect now! */
   mwifi_connect(SSID, PASSPHRASE, strlen(PASSPHRASE), NULL, NULL);
 
-  mos_sleep(8);
-
-  mwifi_ps_on();
-
   return 0;
+}
+
+void wifi_status_notify(int event, void *arg)
+{
+  switch (event)
+  {
+  case NOTIFY_STATION_UP:
+    app_log("Connected");
+    break;
+  case NOTIFY_STATION_DOWN:
+    app_log("Disonnected");
+    break;
+  }
 }

@@ -22,8 +22,8 @@
 ############################################################################### 
 
 
-NAME := App_wifi_beacon
+NAME := SOFTAP
 
-$(NAME)_SOURCES := main.c 80211sim.c
+$(NAME)_SOURCES := main.c
 				      
 

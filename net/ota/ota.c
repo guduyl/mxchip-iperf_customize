@@ -95,7 +95,7 @@ static void cli_ota(char *pcWriteBuffer, int xWriteBufferLen,int argc, char **ar
     }
 }
 
-static const struct cli_command ota_clis[] = {
+static const mcli_cmd_t ota_clis[] = {
     {"otad", "ota [start | pause | resume | stop ] [url] <md5>, Download OTA data from [url], check <md5> if available, and replace current firmware", cli_ota},
 };
 
@@ -119,7 +119,7 @@ int main( void )
     mos_semphr_acquire( wait_sem, MOS_WAIT_FOREVER );
     ota_log( "wifi connected successful, input \"help\" for useful commands." );
 
-    cli_register_commands(ota_clis, sizeof(ota_clis)/sizeof(struct cli_command));
+    mcli_cmds_add(ota_clis, sizeof(ota_clis)/sizeof(mcli_cmd_t));
 
 exit:
     if ( wait_sem ) mxos_rtos_deinit_semaphore( &wait_sem );

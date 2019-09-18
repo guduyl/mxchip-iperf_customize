@@ -22,10 +22,8 @@
 ############################################################################### 
 
 
-NAME := App_Psk
+NAME := PSK
 
 $(NAME)_SOURCES := main.c
-
-GLOBAL_DEFINES := AOS_NO_WIFI
 
 $(NAME)_COMPONENTS := wolfSSL
