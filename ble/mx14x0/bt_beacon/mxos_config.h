@@ -13,7 +13,7 @@
 
 #define MXOS_WLAN_AUTO_CONFIG                   0
 
-#define mxos_WLAN_CONNECTION_ENABLE             0
+#define MXOS_WLAN_CONNECTION_ENABLE             0
 
 #define MXOS_CLI_ENABLE                         1
 
