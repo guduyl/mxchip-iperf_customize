@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file    hello_world.c
+ * @file    helloworld.c
  * @author  Snow Yang
  * @version V1.0.0
  * @date    2-Feb-2019
@@ -32,7 +32,7 @@
 
 #include "mxos.h"
 
-#define app_log(M, ...)       MXOS_LOG(CONFIG_APP_DEBUG, "APP", M, ##__VA_ARGS__)
+#define app_log(M, ...) MXOS_LOG(CONFIG_APP_DEBUG, "APP", M, ##__VA_ARGS__)
 
 int main(void)
 {
@@ -41,4 +41,6 @@ int main(void)
 
 	/* Output on debug serial port */
 	app_log("Hello world!");
+
+	return 0;
 }
