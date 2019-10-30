@@ -27,7 +27,7 @@ extern "C" {
 
 
 #define BLE_PRINT	printf
-#define BD_ADDR_FMT "%02x:%02x:%02x:%02x:%02x:%02x"
+#define BD_ADDR_FMT "%02x%02x%02x%02x%02x%02x"
 #define BD_ADDR_ARG(x) (x)[5],(x)[4],(x)[3],(x)[2],(x)[1],(x)[0]
 #define UUID_128_FORMAT 0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X:0x%2X
 #define UUID_128(x) (x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9],x[10],x[11],x[12],x[13],x[14],x[15])
@@ -38,7 +38,7 @@ extern "C" {
  *                              Variables
  *============================================================================*/
 extern T_CLIENT_ID   ble_central_gcs_client_id;         /**< General Common Services client client id*/
-extern T_CLIENT_ID   hids_client_id;
+extern T_CLIENT_ID   simple_ble_client_id;
 /*============================================================================*
  *                              Functions
  *============================================================================*/
@@ -67,6 +67,8 @@ T_APP_RESULT ble_central_app_gap_callback(uint8_t cb_type, void *p_cb_data);
  * @retval   result @ref T_APP_RESULT
  */
 T_APP_RESULT ble_central_gcs_client_callback(T_CLIENT_ID client_id, uint8_t conn_id, void *p_data);
+
+T_APP_RESULT ble_central_simple_ble_client_callback(T_CLIENT_ID client_id, uint8_t conn_id, void *p_data);
 
 T_APP_RESULT hids_client_callback(T_CLIENT_ID client_id, uint8_t conn_id, void *p_data);
 

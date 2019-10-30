@@ -26,6 +26,8 @@
 #include <ble_central_link_mgr.h>
 #include <gcs_client.h>
 #include "mxos.h"
+#include "simple_ble_client.h"
+#include "StringUtils.h"
 
 #define app_log(M, ...) MXOS_LOG(CONFIG_APP_DEBUG, "APP", M, ##__VA_ARGS__)
 
@@ -39,7 +41,7 @@
 /** @addtogroup  CENTRAL_CLIIENT_CALLBACK
     * @{
     */
-T_CLIENT_ID   hids_client_id;
+T_CLIENT_ID   simple_ble_client_id;
 T_CLIENT_ID   ble_central_gcs_client_id;         /**< General Common Services client client id*/
 /** @} */ /* End of group CENTRAL_CLIIENT_CALLBACK */
 
@@ -138,6 +140,7 @@ void ble_central_app_handle_conn_state_evt(uint8_t conn_id, T_GAP_CONN_STATE new
             le_get_conn_addr(conn_id, app_link_table[conn_id].bd_addr,
                              &app_link_table[conn_id].bd_type);
 			app_log("Connected success conn_id %d", conn_id);
+            simp_ble_client_start_discovery(conn_id);
         }
         break;
 
@@ -841,6 +844,75 @@ T_APP_RESULT ble_central_gcs_client_callback(T_CLIENT_ID client_id, uint8_t conn
 
     return result;
 }
+
+T_APP_RESULT ble_central_simple_ble_client_callback(T_CLIENT_ID client_id, uint8_t conn_id, void *p_data)
+{
+    char *str = NULL;
+    T_APP_RESULT  result = APP_RESULT_SUCCESS;
+    app_log("ble_central_simple_ble_client_callback: client_id %d, conn_id %d",
+                    client_id, conn_id);
+    if (client_id == simple_ble_client_id)
+    {
+        T_SIMP_CLIENT_CB_DATA *p_sbc_cb_data = (T_SIMP_CLIENT_CB_DATA *)p_data;
+        switch (p_sbc_cb_data->cb_type)
+        {
+        case SIMP_CLIENT_CB_TYPE_DISC_STATE:
+            // if(p_sbc_cb_data->cb_content.disc_state == DISC_SIMP_DONE)
+            // {
+            //     simp_ble_client_set_v3_notify(conn_id, true);
+            //     simp_ble_client_set_v4_ind(conn_id, true);
+            // }
+            // ble_central_gcs_handle_discovery_result(conn_id, p_sbc_cb_data->cb_content.discov_result);
+            break;
+        case SIMP_CLIENT_CB_TYPE_READ_RESULT:
+            app_log("READ RESULT: cause 0x%x, value_len %d",
+                            p_sbc_cb_data->cb_content.read_result.cause,
+                            p_sbc_cb_data->cb_content.read_result.data.v1_read.value_size);
+            str = DataToHexStringWithSpaces(p_sbc_cb_data->cb_content.read_result.data.v1_read.p_value, p_sbc_cb_data->cb_content.read_result.data.v1_read.value_size);
+            app_log("%s", str);
+            if (str)
+                free(str);
+
+            // if (p_gcs_cb_data->cb_content.read_result.cause == GAP_SUCCESS)
+            // {
+			// 	BLE_PRINT("REAR VALUE:");
+			// 	for(int i=0; i< p_gcs_cb_data->cb_content.read_result.value_size; i++)
+			// 		BLE_PRINT("0x%2X", *(p_gcs_cb_data->cb_content.read_result.p_value + i));
+			// 	BLE_PRINT("\n\r");
+
+            // }
+            break;
+        case SIMP_CLIENT_CB_TYPE_WRITE_RESULT:
+            app_log("WRITE RESULT: cause 0x%x , type %d",
+                            p_sbc_cb_data->cb_content.write_result.cause,
+                            p_sbc_cb_data->cb_content.write_result.type);
+            break;
+        case SIMP_CLIENT_CB_TYPE_NOTIF_IND_RESULT:
+            if (p_sbc_cb_data->cb_content.notif_ind_data.type == SIMP_V4_INDICATE)
+            {
+                app_log("INDICATION: value_size %d", p_sbc_cb_data->cb_content.notif_ind_data.data.value_size);
+                str = DataToHexStringWithSpaces(p_sbc_cb_data->cb_content.notif_ind_data.data.p_value, p_sbc_cb_data->cb_content.notif_ind_data.data.value_size);
+                app_log("%s", str);
+                if (str)
+                    free(str);
+            }
+            else
+            {
+                app_log("NOTIFICATION: value_size %d", p_sbc_cb_data->cb_content.notif_ind_data.data.value_size);
+                str = DataToHexStringWithSpaces(p_sbc_cb_data->cb_content.notif_ind_data.data.p_value, p_sbc_cb_data->cb_content.notif_ind_data.data.value_size);
+                app_log("%s", str);
+                if (str)
+                    free(str);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return result;
+}
+
 
 /** @} */ /* End of group GCS_CLIIENT_CALLBACK */
 /** @} */ /* End of group CENTRAL_CLIENT_APP */

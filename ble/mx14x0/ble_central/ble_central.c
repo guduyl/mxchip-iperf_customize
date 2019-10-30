@@ -14,6 +14,7 @@
 #include "gcs_client.h"
 #include "StringUtils.h"
 #include "ble_central_link_mgr.h"
+#include "simple_ble_client.h"
 
 #define app_log(M, ...) MXOS_LOG(CONFIG_APP_DEBUG, "APP", M, ##__VA_ARGS__)
 
@@ -98,9 +99,10 @@ void ble_central_app_le_gap_init(void)
  */
 void ble_central_app_le_profile_init(void)
 {
-    client_init(1);
+    client_init(2);
 
     ble_central_gcs_client_id = gcs_add_client(ble_central_gcs_client_callback, BLE_CENTRAL_APP_MAX_LINKS, BLE_CENTRAL_APP_MAX_DISCOV_TABLE_NUM);
+    simple_ble_client_id = simp_ble_add_client(ble_central_simple_ble_client_callback, BLE_CENTRAL_APP_MAX_LINKS);
 }
 
 void ble_central_connect(uint8_t *DestAddr, uint8_t type)
@@ -121,7 +123,7 @@ void ble_central_connect(uint8_t *DestAddr, uint8_t type)
     conn_req_param.ce_len_max = 2 * (conn_req_param.conn_interval_max - 1);
     le_set_conn_param(GAP_CONN_PARAM_1M, &conn_req_param);
 
-    app_log("cmd_con, DestAddr: %2X:%2X:%2X:%2X:%2X:%2X",
+    app_log("cmd_con, DestAddr: %02X:%02X:%02X:%02X:%02X:%02X",
             DestAddr[5], DestAddr[4], DestAddr[3], DestAddr[2], DestAddr[1],DestAddr[0]);
 
     mbt_le_conn(DestAddr, (T_GAP_REMOTE_ADDR_TYPE)DestAddrType, 1000);
@@ -220,6 +222,58 @@ static void cmd_condev(int argc, char *argv[])
     }
 }
 
+static void cmd_ind(int argc, char *argv[])
+{
+    int conn_id = 0, value = 0;
+    bool b_value = false;
+
+    if (argc == 3)
+    {   
+        conn_id = atoi(argv[1]);
+        value = atoi(argv[2]);
+
+        b_value = value == 0 ? false:true;
+        if(conn_id >= BLE_CENTRAL_APP_MAX_LINKS)
+            return;
+
+        simp_ble_client_set_v4_ind(conn_id, b_value);
+    }
+}
+
+static void cmd_notify(int argc, char *argv[])
+{
+    int conn_id = 0, value = 0;
+    bool b_value = false;
+
+    if (argc == 3)
+    {    
+        conn_id = atoi(argv[1]);
+        value = atoi(argv[2]);
+
+        b_value = value == 0 ? false:true;
+        if(conn_id >= BLE_CENTRAL_APP_MAX_LINKS)
+            return;
+
+        simp_ble_client_set_v3_notify(conn_id, b_value);
+    }
+}
+
+static void cmd_write(int argc, char *argv[])
+{
+    int conn_id = 0, value = 0;
+
+    if (argc <= 2)
+        return;
+
+    conn_id = atoi(argv[1]);
+
+    simp_ble_client_write_v2_char(conn_id, strlen(argv[2]), (uint8_t *)argv[2], GATT_WRITE_TYPE_CMD);
+}
+
+static void cmd_read(int argc, char *argv[])
+{
+}
+
 static mcli_cmd_t user_cmds[] =
 {
     {
@@ -231,6 +285,26 @@ static mcli_cmd_t user_cmds[] =
         "condev",
         "connect to specific bt addr",
         cmd_condev
+    },
+    {
+        "notify",
+        "enable/disable notify. notify connid value",
+        cmd_notify
+    },
+    {
+        "ind",
+        "enable/disable indication. ind connid value",
+        cmd_ind
+    },
+    {
+        "write",
+        "write to peripheral, write connid data",
+        cmd_write
+    },
+    {
+        "read",
+        "read data",
+        cmd_read
     }
 };
 
