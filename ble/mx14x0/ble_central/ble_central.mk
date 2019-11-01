@@ -26,4 +26,4 @@ NAME := App_ble_central
 
 $(NAME)_SOURCES := ble_central.c ble_central_client_app.c ble_central_link_mgr.c
 				   
-$(NAME)_COMPONENTS += ble/mx14x0/ble_components
+$(NAME)_COMPONENTS += ble_components

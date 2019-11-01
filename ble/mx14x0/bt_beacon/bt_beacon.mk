@@ -26,6 +26,6 @@ NAME := App_bt_beacon
 
 $(NAME)_SOURCES := bt_beacon.c bt_beacon_app.c
 
-$(NAME)_COMPONENTS += ble/mx14x0/ble_components
+$(NAME)_COMPONENTS += ble_components
 				      
 
