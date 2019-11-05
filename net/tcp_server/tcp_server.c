@@ -135,10 +135,8 @@ void tcp_server_thread( )
 //                inet_ntoa( client_ip_str, client_addr.s_ip );
                 strcpy( client_ip_str, inet_ntoa( client_addr.sin_addr ) );
                 tcp_server_log( "TCP Client %s:%d connected, fd: %d", client_ip_str, client_addr.sin_port, client_fd );
-                if ( kNoErr
-                     != mos_thread_new(MOS_APPLICATION_PRIORITY, "TCP Clients",
-                                                 tcp_client_thread,
-                                                 0x800, client_fd ) )
+                if ( NULL == mos_thread_new(MOS_APPLICATION_PRIORITY, "TCP Clients",
+                        tcp_client_thread, 0x800, client_fd ) )
                     SocketClose( &client_fd );
             }
         }
