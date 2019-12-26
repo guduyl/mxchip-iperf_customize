@@ -29,8 +29,8 @@
 ******************************************************************************
 */
 
-#ifndef __mxos_CONFIG_H
-#define __mxos_CONFIG_H
+#ifndef __MXOS_CONFIG_H
+#define __MXOS_CONFIG_H
 
 #define mxos_DEFAULT_APPLICATION_STACK_SIZE     4000
 
