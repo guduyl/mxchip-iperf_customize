@@ -24,8 +24,10 @@
 
 NAME := App_bt_beacon
 
-$(NAME)_SOURCES := bt_beacon.c bt_beacon_app.c
+$(NAME)_SOURCES := 	bt_beacon.c \
+					bt_beacon_app.c
 
-$(NAME)_COMPONENTS += ble_components
+$(NAME)_COMPONENTS += 	lib_amebad_bt \
+						wolfSSL
 				      
 

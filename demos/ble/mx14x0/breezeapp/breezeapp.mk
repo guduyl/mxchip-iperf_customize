@@ -26,6 +26,8 @@ NAME := App_breezeapp
 
 $(NAME)_SOURCES := breezeapp.c
 
-$(NAME)_COMPONENTS += ble_components  wolfSSL
+$(NAME)_COMPONENTS += 	lib_amebad_bt \
+						lib_breeze \
+			  			wolfSSL
 				      
 

@@ -24,8 +24,9 @@
 
 NAME := App_ble_peripheral
 
-$(NAME)_SOURCES := ble_peripheral.c peripheral_app.c
+$(NAME)_SOURCES := 	ble_peripheral.c \
+					peripheral_app.c
 
-$(NAME)_COMPONENTS += ble_components
+$(NAME)_COMPONENTS += lib_amebad_bt
 				      
 
