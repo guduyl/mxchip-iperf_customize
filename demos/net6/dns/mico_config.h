@@ -13,6 +13,6 @@
 
 /************************************************************************
  * Enable IPv6 in TCPIP stack. */
-#define mxos_CONFIG_IPV6           1
+#define MXOS_CONFIG_IPV6           1
 
 #endif

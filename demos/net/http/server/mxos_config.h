@@ -42,13 +42,13 @@
 
 /************************************************************************
  * Application thread stack size */
-#define mxos_DEFAULT_APPLICATION_STACK_SIZE         (2000)
+#define MXOS_DEFAULT_APPLICATION_STACK_SIZE         (2000)
 
 /************************************************************************
  * Enable wlan connection, start easylink configuration if no wlan settings are existed */
-#define mxos_WLAN_CONNECTION_ENABLE
+#define MXOS_WLAN_CONNECTION_ENABLE
 
-#define mxos_WLAN_CONFIG_MODE CONFIG_MODE_SOFT_AP
+#define MXOS_WLAN_CONFIG_MODE CONFIG_MODE_SOFT_AP
 
 #define EasyLink_TimeOut                60000 /**< EasyLink timeout 60 seconds. */
 
@@ -61,20 +61,20 @@
 
 /************************************************************************
  * Command line interface */
-#define mxos_CLI_ENABLE  
+#define MXOS_CLI_ENABLE  
 
 /************************************************************************
  * Start a system monitor daemon, application can register some monitor  
  * points, If one of these points is not executed in a predefined period, 
  * a watchdog reset will occur. */
-#define mxos_SYSTEM_MONITOR_ENABLE
+#define MXOS_SYSTEM_MONITOR_ENABLE
 
 /************************************************************************
  * Add service _easylink._tcp._local. for discovery */
-#define mxos_SYSTEM_DISCOVERY_ENABLE  
+#define MXOS_SYSTEM_DISCOVERY_ENABLE  
 
 /************************************************************************
  * MiCO TCP server used for configuration and ota. */
-#define mxos_CONFIG_SERVER_ENABLE 
-#define mxos_CONFIG_SERVER_PORT    8000
+#define MXOS_CONFIG_SERVER_ENABLE 
+#define MXOS_CONFIG_SERVER_PORT    8000
 

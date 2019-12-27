@@ -28,7 +28,7 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 #include "HTTPUtils.h"
 #include "SocketUtils.h"
 #include "StringUtils.h"

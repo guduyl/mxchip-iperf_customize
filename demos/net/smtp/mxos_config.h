@@ -34,7 +34,7 @@
 
 /************************************************************************
  * Application thread stack size */
-#define mxos_DEFAULT_APPLICATION_STACK_SIZE         (8000)
+#define MXOS_DEFAULT_APPLICATION_STACK_SIZE         (8000)
 
 
 #endif
