@@ -8,18 +8,15 @@
 ******************************************************************************
 */
 
-
-#ifndef __MXOS_CONFIG_H
-#define __MXOS_CONFIG_H
-
-/************************************************************************
- * Enable IPv4 and IPv6 dual stack apis */
-#define MXOS_CONFIG_IPV6             0
+#ifndef __MXOS_CONFIG_H__
+#define __MXOS_CONFIG_H__
 
 /************************************************************************
- * mdns options */
-#define CONFIG_MDNS_QUERY            1
-#define CONFIG_MDNS_DEBUG            MXOS_DEBUG_OFF
+ * Main application stack size. */
+#define MXOS_DEFAULT_APPLICATION_STACK_SIZE         (0x2000)
 
+/************************************************************************
+ * Enable IPv6 in TCPIP stack. */
+#define MXOS_CONFIG_IPV6           1
 
 #endif

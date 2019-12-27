@@ -19,7 +19,7 @@
 /************************************************************************
  * mdns options */
 #define CONFIG_MDNS_QUERY            1
-#define CONFIG_MDNS_DEBUG            mxos_DEBUG_OFF
+#define CONFIG_MDNS_DEBUG            MXOS_DEBUG_OFF
 
 
 #endif

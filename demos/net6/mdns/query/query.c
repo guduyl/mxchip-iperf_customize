@@ -29,11 +29,10 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 #include "mdns.h"
 
-#define QUERY_DEBUG mxos_DEBUG_ON
-#define qurey_printf(M, ...) mxos_PRINT(QUERY_DEBUG, M, ##__VA_ARGS__)
+#define app_log(M, ...) custom_log("query", M, ##__VA_ARGS__)
 
 char service_type[]="_smb._tcp.local";
 
@@ -41,49 +40,48 @@ static int _mdns_query_cb(void *data, const struct mdns_service *s, int status)
 {
     char ip_str_buf[INET6_ADDRSTRLEN];
 
-    qurey_printf("\r\n==================Got callback for %s======================\r\n", s->servname);
+    app_log("\r\n==================Got callback for %s======================\r\n", s->servname);
 
     if ( status == MDNS_DISCOVERED )
-        qurey_printf("DISCOVERED:\r\n");
+        app_log("DISCOVERED:\r\n");
     else if ( status == MDNS_CACHE_FULL )
-        qurey_printf("NOT_CACHED:\r\n");
+        app_log("NOT_CACHED:\r\n");
     else if ( status == MDNS_DISAPPEARED )
-        qurey_printf("DISAPPEARED:\r\n");
+        app_log("DISAPPEARED:\r\n");
     else if ( status == MDNS_UPDATED )
-        qurey_printf("UPDATED:\r\n");
+        app_log("UPDATED:\r\n");
     else {
-        qurey_printf("Warning: unknown status %d\r\n", status);
+        app_log("Warning: unknown status %d\r\n", status);
         return kNoErr;
     }
-    qurey_printf("%s._%s._%s.%s. port:%d\r\n", s->servname, s->servtype,
+    app_log("%s._%s._%s.%s. port:%d\r\n", s->servname, s->servtype,
                  s->proto == MDNS_PROTO_UDP ? "udp" : "tcp",
                  s->domain, s->port);
 
-    qurey_printf("at %s\r\n", inet_ntop(AF_INET, &s->ipaddr, ip_str_buf, INET6_ADDRSTRLEN));
+    app_log("at %s\r\n", inet_ntop(AF_INET, &s->ipaddr, ip_str_buf, INET6_ADDRSTRLEN));
 #if MXOS_CONFIG_IPV6
-    qurey_printf("at %s\r\n", inet_ntop(AF_INET6, s->ip6addr, ip_str_buf, INET6_ADDRSTRLEN));
+    app_log("at %s\r\n", inet_ntop(AF_INET6, s->ip6addr, ip_str_buf, INET6_ADDRSTRLEN));
 #endif
 
-    qurey_printf("TXT : %s\r\n", s->keyvals ? s->keyvals : "no key vals");
+    app_log("TXT : %s\r\n", s->keyvals ? s->keyvals : "no key vals");
 
     return kNoErr;
 }
 
-int application_start(void)
+int main(void)
 {
     merr_t err = kNoErr;
 
-    /* Initialize system core data */
-    mxos_Context_t *context = system_context_init( 0 );
-
     /* Initialize tcpip, Wi-Fi stacks and system functions */
-    err = mxos_system_init( context );
+    err = mxos_system_init( );
+    require_noerr( err, exit );
 
     /* Initialize mdns protocol and start query */
     mdns_start(NULL, DEFAULT_NAME);
     mdns_query_monitor(service_type, _mdns_query_cb, NULL, INTERFACE_STA);
     //mdns_cli_init();
 
+    exit:
     return err;
 }
 

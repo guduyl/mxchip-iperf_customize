@@ -8,15 +8,15 @@
 ******************************************************************************
 */
 
-#ifndef __MXOS_CONFIG_H
-#define __MXOS_CONFIG_H
+#ifndef __MXOS_CONFIG_H__
+#define __MXOS_CONFIG_H__
 
 /************************************************************************
  * Main application stack size. */
-#define mxos_DEFAULT_APPLICATION_STACK_SIZE         (0x2000)
+#define MXOS_DEFAULT_APPLICATION_STACK_SIZE         (0x2000)
 
 /************************************************************************
  * Enable IPv6 in TCPIP stack. */
-#define mxos_CONFIG_IPV6           1
+#define MXOS_CONFIG_IPV6           1
 
 #endif

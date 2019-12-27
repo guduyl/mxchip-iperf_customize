@@ -35,14 +35,10 @@
 
 #define http_client_log(M, ...) custom_log("HTTP", M, ##__VA_ARGS__)
 
-static merr_t onReceivedData( struct _HTTPHeader_t * httpHeader,
-                                uint32_t pos,
-                                uint8_t *data,
-                                size_t len,
-                                void * userContext );
+static merr_t onReceivedData( struct _HTTPHeader_t * httpHeader, uint32_t pos, uint8_t *data, size_t len, void * userContext );
 static void onClearData( struct _HTTPHeader_t * inHeader, void * inUserContext );
 
-static mxos_semaphore_t wait_sem = NULL;
+static mos_semphr_id_t wait_sem = NULL;
 
 typedef struct _http_context_t
 {
@@ -65,7 +61,10 @@ static void micoNotify_WifiStatusHandler( WiFiEvent status, void* const inContex
     switch ( status )
     {
         case NOTIFY_STATION_UP:
-            if ( wait_sem != NULL ) mxos_rtos_set_semaphore(&wait_sem);
+            if ( wait_sem != NULL )
+            {
+                mos_semphr_release( wait_sem );
+            }
             break;
         case NOTIFY_STATION_DOWN:
             case NOTIFY_AP_UP:
@@ -128,7 +127,7 @@ int application_start( void )
 {
     merr_t err = kNoErr;
 
-    mxos_rtos_init_semaphore( &wait_sem, 1 );
+    wait_sem = mos_semphr_new(1);
 
     /*Register user function for MiCO nitification: WiFi status changed */
     err = mxos_system_notify_register( mxos_notify_WIFI_STATUS_CHANGED,
@@ -136,11 +135,11 @@ int application_start( void )
     require_noerr( err, exit );
 
     /* Start MiCO system functions according to mxos_config.h */
-    err = mxos_system_init( system_context_init( 0 ) );
+    err = mxos_system_init( );
     require_noerr( err, exit );
 
     /* Wait for wlan connection*/
-    mxos_rtos_get_semaphore( &wait_sem, mxos_WAIT_FOREVER );
+    mos_semphr_acquire(wait_sem, MOS_WAIT_FOREVER);
     http_client_log( "wifi connected successful" );
 
     /* Read http data from server */
@@ -149,8 +148,12 @@ int application_start( void )
 
 exit:
     mxos_system_notify_remove( mxos_notify_WIFI_STATUS_CHANGED, (void *) micoNotify_WifiStatusHandler );
-    if ( wait_sem != NULL )  mxos_rtos_deinit_semaphore( &wait_sem );
-    mxos_rtos_delete_thread( NULL );
+    if ( wait_sem != NULL )
+    {
+        mos_semphr_delete( wait_sem );
+    }
+
+    mos_thread_delete( NULL );
     return err;
 }
 

@@ -11,7 +11,7 @@
 #ifndef __MXOS_CONFIG_H
 #define __MXOS_CONFIG_H
 
-//#define CONFIG_MDNS_DEBUG                      mxos_DEBUG_ON
+//#define CONFIG_MDNS_DEBUG                      MXOS_DEBUG_ON
 #define MXOS_WLAN_CONNECTION_ENABLE             0
 
 

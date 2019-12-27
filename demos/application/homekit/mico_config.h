@@ -20,7 +20,7 @@
 
 #define APP_INFO   "Apple HomeKit Demo based on MICO OS"
 
-#define FIRMWARE_REVISION   "mxos_HOMEKIT_1"
+#define FIRMWARE_REVISION   "MXOSHOMEKIT_1"
 #define MANUFACTURER        "MXCHIP Inc."
 #define SERIAL_NUMBER       "20140606"
 #define PROTOCOL            "com.apple.homekit"
