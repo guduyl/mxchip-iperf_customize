@@ -37,26 +37,6 @@
 
 #define sntp_demo_log(M, ...) custom_log("SNTP DEMO", M, ##__VA_ARGS__)
 
-/**/
-static struct tm* read_utc_time_from_rtc( void )
-{
-    time_t t;
-    struct tm *utc_time;
-
-    /*Read current time from RTC.*/
-    if ( mhal_rtc_get_time( &t ) == kNoErr )
-    {
-        utc_time = localtime(&t);
-
-        return utc_time;
-    }
-    else
-    {
-        sntp_demo_log("RTC function unsupported");
-        return NULL;
-    }
-}
-
 /* Callback function when MiCO UTC time in sync to NTP server */
 static void sntp_time_synced( void )
 {
@@ -66,12 +46,6 @@ static void sntp_time_synced( void )
 
     mxos_time_get_iso8601_time( &iso8601_time );
     sntp_demo_log("sntp_time_synced: %.26s", (char*)&iso8601_time);
-
-    mxos_time_get_utc_time( &utc_time );
-
-    //currentTime = localtime( (const time_t *)&utc_time );
-
-    mhal_rtc_set_time( utc_time );
 }
 
 int main( void )
@@ -80,12 +54,6 @@ int main( void )
     struct tm*         utc_time;
     mxos_utc_time_ms_t utc_time_ms;
     iso8601_time_t     iso8601_time;
-
-    /* Read UTC time from RTC hardware, and update UTC time to MiCO system */
-    utc_time = read_utc_time_from_rtc( );
-    utc_time_ms = (uint64_t) mktime( utc_time ) * (uint64_t) 1000;
-    mxos_time_set_utc_time_ms( &utc_time_ms );
-    sntp_demo_log("Current RTC Time: %s",asctime( utc_time ) );
 
     /* Start MiCO system functions according to mxos_config.h*/
     err = mxos_system_init( );
@@ -98,6 +66,7 @@ int main( void )
     while ( 1 )
     {
         mxos_time_get_iso8601_time( &iso8601_time );
+
         sntp_demo_log("Current time: %.26s", (char*)&iso8601_time);
         mos_msleep( 10 * 1000 );
     }
