@@ -1,0 +1,20 @@
+WPA_ENTERPRISE mode
+
+How to setup a WPA enterprise enviroment?
+1. Setup an wifi router which support WPA enterprise mode. Such as a DD-WRT router. 
+2. Setup a radius server. 
+	macOS ref: https://wiki.freeradius.org/building/macOS
+	Linux ref: https://wiki.freeradius.org/building/Debian%20and%20Ubuntu
+
+git clone https://github.com/FreeRADIUS/freeradius-server.git
+cd freeradius-server
+git checkout release_3_0_18
+./configure
+make
+sudo make install
+
+The radius configuration files are in DIR: /usr/local/etc/raddb/
+
+
+
+
