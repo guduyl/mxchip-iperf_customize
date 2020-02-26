@@ -38,7 +38,7 @@
 #define V6_V4_PORT   20000 /* Support IPv4&IPv6 TCP client */
 #define V4_ONLY_PORT 20002 /* Only accept IPv4 TCP client */
 
-void micoNotify_WifiStatusHandler( WiFiEvent event, void* const inContext )
+void _WifiStatusHandler( WiFiEvent event, void* const inContext )
 {
     mwifi_ip_attr_t para;
     switch ( event )
@@ -218,7 +218,7 @@ int main( void )
 
     /*Register user function for MiCO nitification: WiFi status changed */
     err = mxos_system_notify_register( mxos_notify_WIFI_STATUS_CHANGED,
-                                       (void *) micoNotify_WifiStatusHandler,
+                                       (void *) _WifiStatusHandler,
                                        NULL );
     require_noerr( err, exit );
 

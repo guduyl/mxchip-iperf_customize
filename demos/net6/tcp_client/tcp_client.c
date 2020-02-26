@@ -34,11 +34,11 @@
 
 #define tcp_client_log(M, ...) custom_log("TCP", M, ##__VA_ARGS__)
 
-static char *tcp_remote_ip = "2001:470:19:513:1846:cea6:499b:6e0e"; /*remote ip address*/
+static char *tcp_remote_ip = "2001:470:19:513:24:f9fc:cd78:4883"; /*remote ip address*/
 static int tcp_remote_port = 6000; /*remote port*/
 static mos_semphr_id_t wait_sem = NULL;
 
-static void micoNotify_WifiStatusHandler( WiFiEvent status, void* const inContext )
+static void _WifiStatusHandler( WiFiEvent status, void* const inContext )
 {
     switch ( status )
     {
@@ -79,7 +79,7 @@ AGAIN:
     err = connect( tcp_fd, (struct sockaddr *)&addr, sizeof(addr) );
     if (err != kNoErr) {
         close(tcp_fd);
-        mos_msleep(2);
+        mos_sleep(2);
         goto AGAIN;
     }
     tcp_client_log( "Connect success!" );
@@ -128,7 +128,7 @@ int main( void )
 
     /*Register user function for MiCO nitification: WiFi status changed */
     err = mxos_system_notify_register( mxos_notify_WIFI_STATUS_CHANGED,
-                                       (void *) micoNotify_WifiStatusHandler, NULL );
+                                       (void *) _WifiStatusHandler, NULL );
     require_noerr( err, exit );
 
     /* Start MiCO system functions according to mxos_config.h */
