@@ -126,7 +126,7 @@ static void _cli_iperf_server_Command( int argc, char **argv )
             break;
         }
     }
-    if ( strcmp( argv[i], "-u" ) != 0 )
+    if ( is_create_task == 0 )
     {
         mcli_printf( "Iperf TCP Server: Start!\r\n" );
         mcli_printf( "Iperf TCP Server Receive Timeout = 20 (secs)\r\n" );
@@ -147,7 +147,7 @@ static void _cli_iperf_client_Command( int argc, char **argv )
     char **g_iperf_param = NULL;
     int is_create_task = 0;
     int offset = IPERF_COMMAND_BUFFER_SIZE / sizeof(char *);
-
+    
     g_iperf_param = malloc( IPERF_COMMAND_BUFFER_NUM * IPERF_COMMAND_BUFFER_SIZE );
     if ( g_iperf_param == NULL )
     {
@@ -174,8 +174,7 @@ static void _cli_iperf_client_Command( int argc, char **argv )
         }
     }
 
-    if ( strcmp( argv[i], "-u" ) != 0 )
-    {
+    if ( is_create_task == 0 ) {
         mcli_printf( "Iperf TCP Client: Start!\r\n" );
         mos_thread_new(IPERF_PRIO, IPERF_NAME, iperf_tcp_run_client_thread, IPERF_STACKSIZE,
                                  (void*) g_iperf_param );

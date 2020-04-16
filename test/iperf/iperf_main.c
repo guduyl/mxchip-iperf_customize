@@ -52,8 +52,6 @@ int main( void )
     /* Register Wi-Fi status notification */
     mxos_system_notify_register(mxos_notify_WIFI_STATUS_CHANGED, wifistatus_notify, NULL);
 
-    cli_init();
-
     /* Register iperf command to test   */
     iperf_cli_register();
     iperf_test_log( "iPerf tester started, input \"iperf -h\" for help." );
