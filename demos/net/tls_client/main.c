@@ -34,13 +34,24 @@
 
 #define tls_client_log(M, ...) custom_log("TLS_C", M, ##__VA_ARGS__)
 
-// #define USE_AWS_IOT
+/* tls debug log */
+// #define TLS_LOG_ENABLE
 
-#ifdef USE_AWS_IOT
+/* use remote public server or local server */
+#define USE_PUBLIC_SERVER
+
+/* data echo test just for local ehco server */
+// #define DATA_ECHO_TEST_ENABLE
+
+
+#ifdef USE_PUBLIC_SERVER
+#if 0  /* use AWS_IOT server */
 /* server hostname */
 #define SERVER_HOSTNAME "animag0r6i3wv-ats.iot.ap-southeast-1.amazonaws.com"
+
 /* server port */
 #define SERVER_PORT (8883)
+
 /* server cert pem */
 #define SERVER_CERT_PEM "-----BEGIN CERTIFICATE-----\n\
 MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF\n\
@@ -113,12 +124,91 @@ T0z1crB/hEVgJHcaMIW++Ft3Iddq5vRMP5uEWU92OLKBNj8hcaePpSLhwI1CJNGw\n\
 UTH5H4mz1aZFmvEpzvSf1ax54klmcew26872wMYQC/z/n+bSYe1Iaq97XEtU3PKP\n\
 voQqbRjadRu1NT+ASCeSYVyhePF3a8g8p9V9aFiGfYQeOeNa6nc=\n\
 -----END RSA PRIVATE KEY-----\n"
+#endif /* use AWS_IOT server */
 
-#else
+#if 1  /* use ST test hosts */
+/* server hostname */
+#define SERVER_HOSTNAME "www.gandi.net"             // with server cert
+// #define SERVER_HOSTNAME "www.openweathermap.org" // same server cert with gandi.net
+// #define SERVER_HOSTNAME "www.st.com"             // with server cert st.com
+// #define SERVER_HOSTNAME "www.worldtimeapi.org"   // without server cert
+
+/* server port */
+#define SERVER_PORT (443)
+
+#if 1  /* www.gandi.net, openweathermap.org server cert */
+#define SERVER_CERT_PEM           ("-----BEGIN CERTIFICATE-----\n\
+MIIF3jCCA8agAwIBAgIQAf1tMPyjylGoG7xkDjUDLTANBgkqhkiG9w0BAQwFADCB\n\
+iDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0pl\n\
+cnNleSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNV\n\
+BAMTJVVTRVJUcnVzdCBSU0EgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTAw\n\
+MjAxMDAwMDAwWhcNMzgwMTE4MjM1OTU5WjCBiDELMAkGA1UEBhMCVVMxEzARBgNV\n\
+BAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNleSBDaXR5MR4wHAYDVQQKExVU\n\
+aGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMTJVVTRVJUcnVzdCBSU0EgQ2Vy\n\
+dGlmaWNhdGlvbiBBdXRob3JpdHkwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIK\n\
+AoICAQCAEmUXNg7D2wiz0KxXDXbtzSfTTK1Qg2HiqiBNCS1kCdzOiZ/MPans9s/B\n\
+3PHTsdZ7NygRK0faOca8Ohm0X6a9fZ2jY0K2dvKpOyuR+OJv0OwWIJAJPuLodMkY\n\
+tJHUYmTbf6MG8YgYapAiPLz+E/CHFHv25B+O1ORRxhFnRghRy4YUVD+8M/5+bJz/\n\
+Fp0YvVGONaanZshyZ9shZrHUm3gDwFA66Mzw3LyeTP6vBZY1H1dat//O+T23LLb2\n\
+VN3I5xI6Ta5MirdcmrS3ID3KfyI0rn47aGYBROcBTkZTmzNg95S+UzeQc0PzMsNT\n\
+79uq/nROacdrjGCT3sTHDN/hMq7MkztReJVni+49Vv4M0GkPGw/zJSZrM233bkf6\n\
+c0Plfg6lZrEpfDKEY1WJxA3Bk1QwGROs0303p+tdOmw1XNtB1xLaqUkL39iAigmT\n\
+Yo61Zs8liM2EuLE/pDkP2QKe6xJMlXzzawWpXhaDzLhn4ugTncxbgtNMs+1b/97l\n\
+c6wjOy0AvzVVdAlJ2ElYGn+SNuZRkg7zJn0cTRe8yexDJtC/QV9AqURE9JnnV4ee\n\
+UB9XVKg+/XRjL7FQZQnmWEIuQxpMtPAlR1n6BB6T1CZGSlCBst6+eLf8ZxXhyVeE\n\
+Hg9j1uliutZfVS7qXMYoCAQlObgOK6nyTJccBz8NUvXt7y+CDwIDAQABo0IwQDAd\n\
+BgNVHQ4EFgQUU3m/WqorSs9UgOHYm8Cd8rIDZsswDgYDVR0PAQH/BAQDAgEGMA8G\n\
+A1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEMBQADggIBAFzUfA3P9wF9QZllDHPF\n\
+Up/L+M+ZBn8b2kMVn54CVVeWFPFSPCeHlCjtHzoBN6J2/FNQwISbxmtOuowhT6KO\n\
+VWKR82kV2LyI48SqC/3vqOlLVSoGIG1VeCkZ7l8wXEskEVX/JJpuXior7gtNn3/3\n\
+ATiUFJVDBwn7YKnuHKsSjKCaXqeYalltiz8I+8jRRa8YFWSQEg9zKC7F4iRO/Fjs\n\
+8PRF/iKz6y+O0tlFYQXBl2+odnKPi4w2r78NBc5xjeambx9spnFixdjQg3IM8WcR\n\
+iQycE0xyNN+81XHfqnHd4blsjDwSXWXavVcStkNr/+XeTWYRUc+ZruwXtuhxkYze\n\
+Sf7dNXGiFSeUHM9h4ya7b6NnJSFd5t0dCy5oGzuCr+yDZ4XUmFF0sbmZgIn/f3gZ\n\
+XHlKYC6SQK5MNyosycdiyA5d9zZbyuAlJQG03RoHnHcAP9Dc1ew91Pq7P8yF1m9/\n\
+qS3fuQL39ZeatTXaw2ewh0qpKJ4jjv9cJ2vhsE/zB+4ALtRZh8tSQZXq9EfX7mRB\n\
+VXyNWQKV3WKdwrnuWih0hKWbt5DHDAff9Yk2dDLWKMGwsAvgnEzDHNb842m1R0aB\n\
+L6KCq9NjRHDEjf8tM7qtj3u1cIiuPhnPQCjY/MiQu12ZIvVS5ljFH4gxQ+6IHdfG\n\
+jjxDah2nGN59PRbxYvnKkKj9\n\
+-----END CERTIFICATE-----\n")
+#endif /* gandi.net server cert */
+
+#if 0  /* www.st.com server cert */
+#define SERVER_CERT_PEM           ("-----BEGIN CERTIFICATE-----\n\
+MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs\n\
+MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\n\
+d3cuZGlnaWNlcnQuY29tMSswKQYDVQQDEyJEaWdpQ2VydCBIaWdoIEFzc3VyYW5j\n\
+ZSBFViBSb290IENBMB4XDTA2MTExMDAwMDAwMFoXDTMxMTExMDAwMDAwMFowbDEL\n\
+MAkGA1UEBhMCVVMxFTATBgNVBAoTDERpZ2lDZXJ0IEluYzEZMBcGA1UECxMQd3d3\n\
+LmRpZ2ljZXJ0LmNvbTErMCkGA1UEAxMiRGlnaUNlcnQgSGlnaCBBc3N1cmFuY2Ug\n\
+RVYgUm9vdCBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMbM5XPm\n\
++9S75S0tMqbf5YE/yc0lSbZxKsPVlDRnogocsF9ppkCxxLeyj9CYpKlBWTrT3JTW\n\
+PNt0OKRKzE0lgvdKpVMSOO7zSW1xkX5jtqumX8OkhPhPYlG++MXs2ziS4wblCJEM\n\
+xChBVfvLWokVfnHoNb9Ncgk9vjo4UFt3MRuNs8ckRZqnrG0AFFoEt7oT61EKmEFB\n\
+Ik5lYYeBQVCmeVyJ3hlKV9Uu5l0cUyx+mM0aBhakaHPQNAQTXKFx01p8VdteZOE3\n\
+hzBWBOURtCmAEvF5OYiiAhF8J2a3iLd48soKqDirCmTCv2ZdlYTBoSUeh10aUAsg\n\
+EsxBu24LUTi4S8sCAwEAAaNjMGEwDgYDVR0PAQH/BAQDAgGGMA8GA1UdEwEB/wQF\n\
+MAMBAf8wHQYDVR0OBBYEFLE+w2kD+L9HAdSYJhoIAu9jZCvDMB8GA1UdIwQYMBaA\n\
+FLE+w2kD+L9HAdSYJhoIAu9jZCvDMA0GCSqGSIb3DQEBBQUAA4IBAQAcGgaX3Nec\n\
+nzyIZgYIVyHbIUf4KmeqvxgydkAQV8GK83rZEWWONfqe/EW1ntlMMUu4kehDLI6z\n\
+eM7b41N5cdblIZQB2lWHmiRk9opmzN6cN82oNLFpmyPInngiK3BD41VHMWEZ71jF\n\
+hS9OMPagMRYjyOfiZRYzy78aG6A9+MpeizGLYAiJLQwGXFK3xPkKmNEVX58Svnw2\n\
+Yzi9RKR/5CYrCsSXaQ3pjOLAEFe4yHYSkVXySGnYvCoCWw9E1CAx2/S6cCZdkGCe\n\
+vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep\n\
++OkuE6N36B9K\n\
+-----END CERTIFICATE-----\n")
+#endif  /* www.st.com server cert */
+
+#endif  /* use ST test hosts */
+
+#else /* !USE_PUBLIC_SERVER (use local server, support client cert/key check) */
+
 /* server hostname */
 #define SERVER_HOSTNAME "192.168.137.1"
+
 /* server port */
 #define SERVER_PORT (9000)
+
 /* server cert pem */
 #define SERVER_CERT_PEM "-----BEGIN CERTIFICATE-----\n\
 MIID8zCCAtugAwIBAgIUD3rsTYxpmxrJ+LFVaIGzgHQXoKUwDQYJKoZIhvcNAQEL\n\
@@ -197,13 +287,16 @@ Ao/jNHWgZKjSHF4fjQNPHD7ObuAr5VvdCFL4x1lJs+6O9g4RG6STsWOethgOnqG0\n\
 vUwfAHXq57dcdqCGoJkGcVtq2soIkZDAsxR+pWV7KNRl1Sn0wDaujrIjbQhgxB5h\n\
 XnSUUkLqDXeLTMI5A97CVtfTzJKyaROJk/kG5cHm/JiS4stEsYTSiw==\n\
 -----END RSA PRIVATE KEY-----\n"
-#endif /* USE_AWS_IOT */
+
+#endif /* USE_PUBLIC_SERVER */
 
 /* data echo test */
+#ifdef DATA_ECHO_TEST_ENABLE
 #define ECHO_LOOP   (10)
 #define TXRX_SIZE   (1024)
 char tx_buf[TXRX_SIZE] = {"Message from MXCHIP wifi module."};
 char rx_buf[TXRX_SIZE];
+#endif /* data echo test */
 
 static mos_semphr_id_t wifi_connect_sem = NULL;
 
@@ -225,6 +318,13 @@ static void micoNotify_WifiStatusHandler(WiFiEvent status, void *const inContext
     }
 }
 
+#ifdef TLS_LOG_ENABLE
+static void ssl_log(int level ,char *msg)
+{
+    tls_client_log("[ssl]%s", msg);
+}
+#endif /* TLS_LOG_ENABLE */
+
 int main(void)
 {
     merr_t err = kNoErr;
@@ -239,6 +339,10 @@ int main(void)
     /* Start MiCO system functions according to mxos_config.h */
     err = mxos_system_init();
     require_noerr(err, exit);
+
+#ifdef TLS_LOG_ENABLE
+    ssl_set_loggingcb(ssl_log);
+#endif /* TLS_LOG_ENABLE */
 
     /* Wait for wlan connection*/
     mos_semphr_acquire(wifi_connect_sem, MOS_WAIT_FOREVER);
@@ -273,7 +377,7 @@ void tls_client_thread( void *arg )
     pptr = hostent_content->h_addr_list;
     in_addr.s_addr = *(uint32_t *)(*pptr);
     strcpy(ipstr, inet_ntoa(in_addr));
-    tls_client_log("tls server address: host:%s, ip: %s", SERVER_HOSTNAME, ipstr);
+    tls_client_log("tls server address: host:%s, ip: %s, port: %d", SERVER_HOSTNAME, ipstr, SERVER_PORT);
 
     /* tcp connect */
     client_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -283,17 +387,31 @@ void tls_client_thread( void *arg )
     err = connect(client_fd, (struct sockaddr *)&addr, sizeof(addr));
     require_noerr_string(err, exit, "connect tls server failed");
 
-    /* tls connect */
+    /* tls set verion */
     tls_client_log("tls version %s", "TLS_V1_2_MODE");
     mtls_set_ver(TLS_V1_2_MODE);
+
+    /* tls set client cert/key */
+    #if 0
+    /* set client cert/key */
     tls_client_log("client cert len %d, cert:\r\n%s", strlen(CLIENT_CERT_PEM), CLIENT_CERT_PEM);
     tls_client_log("client private key len %d, cert:\r\n%s", strlen(CLIENT_PRV_KEY_PEM), CLIENT_PRV_KEY_PEM);
     mtls_set_client_cert(CLIENT_CERT_PEM, CLIENT_PRV_KEY_PEM);
+    #endif
+
+    #if 1 /* connect with rootCA */
     tls_client_log("server CA len %d, CA:\r\n%s", strlen(SERVER_CERT_PEM), SERVER_CERT_PEM);
-    client_ssl = mtls_connect(client_fd, strlen(SERVER_CERT_PEM), SERVER_CERT_PEM, &ssl_errno);
+    // client_ssl = mtls_connect(client_fd, strlen(SERVER_CERT_PEM), SERVER_CERT_PEM, &ssl_errno);
+    client_ssl = mtls_connect_sni(client_fd, strlen(SERVER_CERT_PEM), SERVER_CERT_PEM, SERVER_HOSTNAME, &ssl_errno);
+    
+    #else /* connect without rootCA */
+    // client_ssl = mtls_connect(client_fd, 0, NULL, &ssl_errno);
+    client_ssl = mtls_connect_sni(client_fd, 0, NULL, SERVER_HOSTNAME, &ssl_errno);
+    #endif
+
     if(client_ssl == NULL)
     {
-        tls_client_log("*** tls connect error %d", ssl_errno);
+        tls_client_log("*** tls connect error %d !", ssl_errno);
         err = kConnectionErr;
         goto exit;
     }
@@ -302,7 +420,7 @@ void tls_client_thread( void *arg )
         tls_client_log("============= tls connect success! ============");
     }
     
-    #if 1
+    #ifdef DATA_ECHO_TEST_ENABLE
     for(int i = 0; i < ECHO_LOOP; i++)
     {
         /* tls Send */
@@ -342,10 +460,10 @@ void tls_client_thread( void *arg )
         }
         else
         {
-            tls_client_log("*** socket recv timeout！");
+            tls_client_log("*** socket recv timeout!");
         }
     }
-    #endif // 0
+    #endif /* DATA_ECHO_TEST_ENABLE */
 
 exit:
     tls_client_log("Exit: Client exit with err = %d, fd: %d", err, client_fd);
