@@ -127,30 +127,36 @@ int main(void)
   wifimgr_debug_enable(1);
   cli_init();
 
-#if 0    
+#if 1    
 AGAIN:
     /* demo default eap mode, EAP-PEAP*/
-    //mwifi_eap_connect("wifitest", "bob", "hello", NULL, NULL);
-  
-    //sleep(20);
+    app_log("~~~~~~~~~ connect eap PEAP ~~~~~~~~~");
+    mwifi_eap_connect("wifitest", "bob", "hello", NULL, NULL);
+    sleep(20);
 
     attr.eap_type = EAP_TYPE_PEAP;
     attr.client_cert = client_cert;
     attr.client_key = client_key;
     attr.rootca = rootca;
     /* demo EAP-PEAP mode, check server certificate*/
+    app_log("~~~~~~~~~ connect eap PEAP server check ~~~~~~~~~");
     mwifi_eap_connect("wifitest", "bob", "hello", &attr, NULL);
     sleep(20);
+
     attr.eap_type = EAP_TYPE_TTLS;
     /* demo EAP-TTLS mode, check server certificate*/
+    app_log("~~~~~~~~~ connect eap TTLS server check ~~~~~~~~~");
     mwifi_eap_connect("wifitest", "bob", "hello", &attr, NULL);
     sleep(20);
+
     attr.eap_type = EAP_TYPE_TLS;
     /* demo EAP-TLS mode, check server certificate. EAP-TLS mode need check client certificate */
+    app_log("~~~~~~~~~ connect eap TLS server/client check ~~~~~~~~~");
     mwifi_eap_connect("wifitest", "bob", "hello", &attr, NULL);
-
     sleep(20);
+
     /* passphrase mode connect */
+    app_log("~~~~~~~~~ connect ssid/key ~~~~~~~~~");
     mwifi_connect(PASSPHRASESSID, PASSPHRASE, strlen(PASSPHRASE), NULL, NULL);
     sleep(20);
 goto AGAIN;
@@ -190,10 +196,10 @@ void wifi_status_notify(int event, void *arg)
   switch (event)
   {
   case NOTIFY_STATION_UP:
-    app_log("Connected");
+    app_log("----------------> Connected");
     break;
   case NOTIFY_STATION_DOWN:
-    app_log("Disonnected");
+    app_log("----------------> Disonnected");
     break;
   }
 }
