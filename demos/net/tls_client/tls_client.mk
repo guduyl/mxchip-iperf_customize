@@ -25,5 +25,3 @@
 NAME := App_tls_client
 
 $(NAME)_SOURCES := main.c
-
-$(NAME)_COMPONENTS := wolfSSL

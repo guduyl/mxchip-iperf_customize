@@ -22,8 +22,6 @@
 ############################################################################### 
 
 
-NAME := wpa_enterprise_demo
+NAME := App_http_client
 
 $(NAME)_SOURCES := main.c
-				      
-
