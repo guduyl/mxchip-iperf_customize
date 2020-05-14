@@ -34,8 +34,8 @@
 
 #define tcp_server_log(M, ...) custom_log("TCP", M, ##__VA_ARGS__)
 
-#define V6_ONLY_PORT 20001 /* Only accept IPv6 TCP client */
 #define V6_V4_PORT   20000 /* Support IPv4&IPv6 TCP client */
+#define V6_ONLY_PORT 20001 /* Only accept IPv6 TCP client */
 #define V4_ONLY_PORT 20002 /* Only accept IPv4 TCP client */
 
 void _WifiStatusHandler( WiFiEvent event, void* const inContext )
@@ -136,7 +136,7 @@ void v4_server_thread( void *arg )
             {
 //                inet_ntoa( client_ip_str, client_addr.s_ip );
                 strcpy( client_ip_str, inet_ntoa( client_addr.sin_addr ) );
-                tcp_server_log( "TCP Client %s:%d connected, fd: %d", client_ip_str, client_addr.sin_port, client_fd );
+                tcp_server_log( "TCP Client(V4_ONLY) %s:%d connected, fd: %d", client_ip_str, client_addr.sin_port, client_fd );
                 if ( NULL == mos_thread_new(MOS_APPLICATION_PRIORITY, "TCP Clients",
                         tcp_client_thread, 0x800, client_fd ) )
                     SocketClose( &client_fd );
@@ -172,6 +172,7 @@ void v6_server_thread( void *arg )
         tcp_server_log("IPv6 ONLY on %d", V6_ONLY_PORT);
     } else {
         server_addr.sin6_port = htons( V6_V4_PORT);
+        tcp_server_log("IPv6/v4 dual on %d", V6_V4_PORT);
     }
 
     err = bind( tcp_listen_fd, (struct sockaddr *) &server_addr, sizeof(server_addr) );
@@ -199,7 +200,10 @@ void v6_server_thread( void *arg )
                 } else {
                     inet_ntop(AF_INET6, &client_addr.sin6_addr, client_ip_str, sizeof(client_ip_str));
                 }
-                tcp_server_log( "TCP Client %s@%d connected, fd: %d", client_ip_str, client_addr.sin6_port, client_fd );
+                tcp_server_log( "TCP Client %s@%d connected to (%s) server, fd: %d", 
+                        client_ip_str, client_addr.sin6_port, 
+                        (1 == v6only) ? "V6_ONLY" : "V4/V6",
+                        client_fd );
                 if ( NULL == mos_thread_new( MOS_APPLICATION_PRIORITY, "TCP Clients",
                                 tcp_client_thread, 0x800, client_fd ) )
                     SocketClose( &client_fd );
@@ -229,12 +233,11 @@ int main( void )
     /* Start TCP server listener thread*/
     mos_thread_new( MOS_APPLICATION_PRIORITY, "v4_server", v4_server_thread, 0x800, 0 );
 
-    mos_thread_new( MOS_APPLICATION_PRIORITY, "dual_server", v6_server_thread,0x800,0 );
+    mos_thread_new( MOS_APPLICATION_PRIORITY, "dual_server", v6_server_thread, 0x800, 0 );
 
-    mos_thread_new( MOS_APPLICATION_PRIORITY, "v6_server", v6_server_thread,0x800,1 );
+    mos_thread_new( MOS_APPLICATION_PRIORITY, "v6_server", v6_server_thread, 0x800, 1 );
 
-
-    exit:
+exit:
     mos_thread_delete( NULL );
     return err;
 }

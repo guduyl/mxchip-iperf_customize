@@ -123,7 +123,7 @@ exit:
 }
 
 
-int application_start( void )
+int main( void )
 {
     merr_t err = kNoErr;
 

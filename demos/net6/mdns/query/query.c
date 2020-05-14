@@ -34,7 +34,7 @@
 
 #define app_log(M, ...) custom_log("query", M, ##__VA_ARGS__)
 
-char service_type[]="_smb._tcp.local";
+char service_type[]="_http._tcp.local";  /* see service type & domain in net6.mdns.responder */
 
 static int _mdns_query_cb(void *data, const struct mdns_service *s, int status)
 {

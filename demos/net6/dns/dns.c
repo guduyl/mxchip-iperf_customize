@@ -29,20 +29,21 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 
 #define dns_log(M, ...) custom_log("DNS", M, ##__VA_ARGS__)
 
 #define DOMAIN  "www.baidu.com"
+#define DOMAIN2  "www.sohu.com"
 
-static mxos_semaphore_t wait_sem = NULL;
+static mos_semphr_id_t wait_sem = NULL;
 
 static void micoNotify_WifiStatusHandler( WiFiEvent status, void* const inContext )
 {
     switch ( status )
     {
         case NOTIFY_STATION_UP:
-            mxos_rtos_set_semaphore( &wait_sem );
+            mos_semphr_release( wait_sem );
             break;
         case NOTIFY_STATION_DOWN:
             case NOTIFY_AP_UP:
@@ -90,12 +91,10 @@ exit:
     return err;
 }
 
-int application_start( void )
+int main( void )
 {
     merr_t err = kNoErr;
     char ip_str_buf[INET6_ADDRSTRLEN];
-
-    mxos_rtos_init_semaphore( &wait_sem, 1 );
 
     /*Register user function for MiCO nitification: WiFi status changed */
     err = mxos_system_notify_register( mxos_notify_WIFI_STATUS_CHANGED,
@@ -104,16 +103,23 @@ int application_start( void )
     require_noerr( err, exit );
 
     /* Start MiCO system functions according to mxos_config.h*/
-    err = mxos_system_init( system_context_init( 0 ) );
+    err = mxos_system_init( );
     require_noerr( err, exit );
 
+    wait_sem = mos_semphr_new( 1 );
+    require(NULL != wait_sem, exit);
+
     /* Wait for wlan connection*/
-    mxos_rtos_get_semaphore( &wait_sem, mxos_WAIT_FOREVER );
-    dns_log( "wifi connected successful" );
+    while(kNoErr != mos_semphr_acquire( wait_sem, 30000 ))
+    {
+        dns_log("*** wifi connect 30s timeout!");
+    }
+    dns_log( "wifi connected successful." );
 
-
+    while(1)
+    {
     /* Lookup IPV4 address */
-    if( kNoErr == dns_lookup( DOMAIN, NULL, AF_INET, ip_str_buf, INET6_ADDRSTRLEN ) )
+    if( kNoErr == dns_lookup( DOMAIN2, NULL, AF_INET, ip_str_buf, INET6_ADDRSTRLEN ) )
         dns_log( "%s ipv4 address: %s", DOMAIN, ip_str_buf);
     else
         dns_log( "%s ipv4 address not found", DOMAIN );
@@ -124,9 +130,11 @@ int application_start( void )
     else
         dns_log( "%s ipv6 address not found", DOMAIN );
 
+    mos_sleep(10);
+    }
+
 exit:
     mxos_system_notify_remove( mxos_notify_WIFI_STATUS_CHANGED, (void *) micoNotify_WifiStatusHandler );
-    if ( wait_sem != NULL ) mxos_rtos_deinit_semaphore( &wait_sem );
+    if ( wait_sem != NULL ) mos_semphr_delete( wait_sem );
     return err;
 }
-

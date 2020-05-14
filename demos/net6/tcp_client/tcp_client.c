@@ -34,8 +34,14 @@
 
 #define tcp_client_log(M, ...) custom_log("TCP", M, ##__VA_ARGS__)
 
-static char *tcp_remote_ip = "2001:470:19:513:24:f9fc:cd78:4883"; /*remote ip address*/
-static int tcp_remote_port = 6000; /*remote port*/
+#define TCP_REMOTE_PORT_V4_V6   (20000) /* V4/V6 server port */
+#define TCP_REMOTE_PORT_V6_ONLY (9001)//(20001) /* V6 server port */
+#define TCP_REMOTE_PORT_V4_ONLY (20002) /* V4 server port */
+
+// static char *tcp_remote_ip = "2408:84e2:159:db22:b2f8:93ff:fe20:c7b7"; /* server ip address */
+// static char *tcp_remote_ip = "fe80::e0:4cff:fe86:8b64"; /* server ip address */
+static char *tcp_remote_ip = "2001:2::aab1:8ed:832e:572f:6883"; /* server ip address */
+
 static mos_semphr_id_t wait_sem = NULL;
 
 static void _WifiStatusHandler( WiFiEvent status, void* const inContext )
@@ -53,7 +59,7 @@ static void _WifiStatusHandler( WiFiEvent status, void* const inContext )
 }
 
 /*when client connected wlan success,create socket*/
-void tcp_client_thread(  )
+void tcp_client_thread( void *arg )
 {
     merr_t err;
     struct sockaddr_in6 addr;
@@ -61,28 +67,37 @@ void tcp_client_thread(  )
     fd_set readfds;
     int tcp_fd = -1, len;
     char *buf = NULL;
+    int v6only = (int)arg;
+    int remote_port;
 
     buf = (char*) malloc( 1024 );
     require_action( buf, exit, err = kNoMemoryErr );
 
 AGAIN:
-
     tcp_fd = socket( AF_INET6, SOCK_STREAM, IPPROTO_TCP );
     require_action( IsValidSocket( tcp_fd ), exit, err = kNoResourcesErr );
 
     addr.sin6_family = AF_INET6;
     inet_pton(AF_INET6, tcp_remote_ip, &addr.sin6_addr);
-    addr.sin6_port = htons(tcp_remote_port);
+    if(1 == v6only)
+    {
+        remote_port = TCP_REMOTE_PORT_V6_ONLY;
+    }
+    else
+    {
+       remote_port = TCP_REMOTE_PORT_V4_V6;
+    }
+    addr.sin6_port = htons(remote_port);
 
-
-    tcp_client_log( "Connecting to server: ip=%s  port=%d!", tcp_remote_ip,tcp_remote_port );
+    tcp_client_log( "Connecting to server: ip=%s  port=%d ...", tcp_remote_ip, remote_port );
     err = connect( tcp_fd, (struct sockaddr *)&addr, sizeof(addr) );
     if (err != kNoErr) {
+        tcp_client_log("*** connect error %d !", err);
         close(tcp_fd);
         mos_sleep(2);
         goto AGAIN;
     }
-    tcp_client_log( "Connect success!" );
+    tcp_client_log( "Connect %s success!", (1 == v6only) ? "V6_ONLY" : "V4/V6" );
     
     t.tv_sec = 2;
     t.tv_usec = 0;
@@ -140,8 +155,9 @@ int main( void )
     tcp_client_log( "wifi connected successful" );
 
     /* Start TCP client thread */
-    mos_thread_new( MOS_APPLICATION_PRIORITY, "TCP_client", tcp_client_thread, 0x800, 0 );
-  
+    // mos_thread_new( MOS_APPLICATION_PRIORITY, "TCP_client_v4_v6", tcp_client_thread, 0x800, 0 );
+
+    mos_thread_new( MOS_APPLICATION_PRIORITY, "TCP_client_v6", tcp_client_thread, 0x800, 1 );
 
     exit:
     if ( wait_sem != NULL )
