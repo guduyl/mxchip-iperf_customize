@@ -186,7 +186,7 @@ static ssize_t readtimeout(SMTP *psmtp, void *buf, unsigned int len, int timeout
 
     FD_ZERO(&readfds);
     FD_SET(psmtp->sockfd, &readfds);
-    select(1, &readfds, NULL, NULL, &timeout);
+    select(psmtp->sockfd+1, &readfds, NULL, NULL, &timeout);
 
     if (FD_ISSET(psmtp->sockfd, &readfds))
     {
