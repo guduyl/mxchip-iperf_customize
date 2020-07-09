@@ -23,9 +23,8 @@
 #endif
 #include "HAPPlatformKeyValueStore+SDKDomains.h"
 
-//#include <signal.h>
-
 #include "AccessorySetup.h"
+
 
 static bool requestedFactoryReset = false;
 static bool clearPairings = false;
