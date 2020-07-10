@@ -84,7 +84,7 @@ int main(void)
     app_log( "wifi connected successful" );
 
     /* Start homekit app thread */
-    mos_thread_new( MOS_APPLICATION_PRIORITY, "homekit_app", homekit_app_thread, 0x8000, 0 );
+    mos_thread_new( MOS_APPLICATION_PRIORITY, "homekit_app", homekit_app_thread, 0x4000, 0 );
 
     exit:
     if ( wait_sem != NULL )
