@@ -41,7 +41,9 @@ static mos_queue_id_t ble_msg = NULL;
 //    'D', 'E', 'V', 'I', 'C', 'E', '_', '0', '0', '0', '0'
 //};
 
-#define ADV_MAC_INDEX            (10)
+#define ADV_MAC_INDEX               (10)
+#define ADV_USER_DATA_INDEX         (16)
+#define ADV_USER_DATA_MAX_LEN       (15)
 
 /** @brief  GAP - Advertisement data (max size = 31 bytes, best kept short to conserve power) */
 static uint8_t adv_data[] =
@@ -94,16 +96,30 @@ static void ble_set_adv_ble_mac( void )
     return;
 }
 
+WEAK void ble_adc_get_user_data( void *data_p, uint8_t *len_p )
+{
+    app_log("not set user data in ble adv");
+    return;
+}
+
 void ble_adv_param_set( void )
 {
-    char suning_pid_string[32] = { 0 };
-
-    memset( suning_pid_string, 0, sizeof(suning_pid_string) );
+    uint8_t user_data[ADV_USER_DATA_MAX_LEN] = { 0 };
+    uint8_t len = 0;
 
     ble_set_adv_ble_mac( );
 
+    ble_adc_get_user_data( user_data, &len );
+    require( len <= ADV_USER_DATA_MAX_LEN, exit );
+
+    if ( len > 0 )
+    {
+        memcpy( &adv_data[ADV_USER_DATA_INDEX], user_data, len );
+    }
+
     le_adv_set_param( GAP_PARAM_ADV_DATA, sizeof(adv_data), (void *) adv_data );
 
+    exit:
     return;
 }
 

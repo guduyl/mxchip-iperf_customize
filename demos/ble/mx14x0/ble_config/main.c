@@ -4,6 +4,15 @@
 
 #define app_log(format, ...)        custom_log("app", format, ##__VA_ARGS__)
 
+USED void ble_adc_get_user_data( void *data_p, uint8_t *len_p )
+{
+    char *ble_adv = "ble_config";
+
+    memcpy( data_p, ble_adv, strlen( ble_adv ) );
+    *len_p = (uint8_t) strlen( ble_adv );
+    return;
+}
+
 int main( void )
 {
     merr_t err = kNoErr;
