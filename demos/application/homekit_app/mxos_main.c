@@ -39,6 +39,7 @@ extern int homekit_main(int argc, char* _Nullable argv[_Nullable]);
 
 static mos_semphr_id_t wait_sem = NULL;
 
+/* wifi status changed callback */
 static void micoNotify_WifiStatusHandler( WiFiEvent status, void* const inContext )
 {
     switch ( status )
@@ -53,17 +54,21 @@ static void micoNotify_WifiStatusHandler( WiFiEvent status, void* const inContex
     }
 }
 
-/*when client connected wlan success,create socket*/
-void homekit_app_thread(void *arg)
+/* when wifi connected success,create homekit server */
+static void homekit_app_thread(void *arg)
 {
 	(void)arg;
 
 	/* start homekit app */
 	homekit_main(0, NULL);
 
+    app_log("homekit app thread exit!!!");
 	mos_thread_delete( NULL );
 }
 
+/**
+ * main entrance
+ */
 int main(void)
 {
     merr_t err = kNoErr;
@@ -79,7 +84,7 @@ int main(void)
     err = mxos_system_init(  );
     require_noerr( err, exit );
 
-    /* Wait for wlan connection*/
+    /* Wait for wlan connection */
     mos_semphr_acquire( wait_sem, MOS_WAIT_FOREVER );
     app_log( "wifi connected successful" );
 

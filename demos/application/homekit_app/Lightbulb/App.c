@@ -54,6 +54,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+extern volatile bool requestedFactoryReset;
+
 /**
  * Global accessory configuration.
  */
@@ -172,6 +174,13 @@ static void key1_clicked_callback_process(void* _Nullable context, size_t contex
     ToggleLightBulbState();
 }
 
+static void key1_long_pressed_callback_process(void* _Nullable context, size_t contextSize){
+    HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "EXT_KEY1 long pressed process");
+
+    requestedFactoryReset = true;
+    HAPAccessoryServerStop(accessoryConfiguration.server);
+}
+
 static merr_t key1_clicked_callback_worker(void* arg){
     HAPError hap_err;
 
@@ -186,16 +195,35 @@ static merr_t key1_clicked_callback_worker(void* arg){
     }
 }
 
+static merr_t key1_long_pressed_callback_worker(void* arg){
+    HAPError hap_err;
+
+    HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "EXT_KEY1 long pressed worker.");
+
+    hap_err = HAPPlatformRunLoopScheduleCallback(key1_long_pressed_callback_process, NULL, 0);
+    if(kHAPError_None != hap_err){
+        HAPLogError(&kHAPLog_Default, "%s: HAPPlatformRunLoopScheduleCallback error: %u", __func__, hap_err);
+        return kNoResourcesErr;
+    }
+    else{
+        return kNoErr;
+    }
+}
+
 static void ext_key1_clicked_callback(void){
     mos_worker_send_async_event( &key_event_worker_thread, key1_clicked_callback_worker, NULL );
+}
+
+static void ext_key1_long_pressed_callback(void){
+    mos_worker_send_async_event( &key_event_worker_thread, key1_long_pressed_callback_worker, NULL );
 }
 
 static void ext_key1_init(void){
     ext_key1.gpio = EXT_KEY1;
     ext_key1.idle = IOBUTTON_IDLE_STATE_HIGH;
     ext_key1.pressed_func = ext_key1_clicked_callback;
-    ext_key1.long_pressed_func = NULL;
-    ext_key1.long_pressed_timeout = 5000;
+    ext_key1.long_pressed_func = ext_key1_long_pressed_callback;
+    ext_key1.long_pressed_timeout = 4000;
     button_init(&ext_key1);
 
     mos_worker_thread_new( &key_event_worker_thread, MOS_APPLICATION_PRIORITY, 0x1000, 3 );
@@ -206,9 +234,12 @@ static void ext_key1_init(void){
  */
 static int hardware_init(void){
     merr_t ret = kNoErr;
+    static bool _hw_inited = false;
 
-    /* OLED to display info */
-    //TODO
+    if(_hw_inited)
+    {
+        return kNoErr;
+    }
 
     /* dc motor for device identify */
     device_identify_init();
@@ -218,6 +249,8 @@ static int hardware_init(void){
 
     /* ext_key1 */
     ext_key1_init();
+
+    _hw_inited = true;
 
     return ret;
 }
