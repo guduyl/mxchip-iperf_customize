@@ -5,6 +5,14 @@
 
 ### ChangeLog
 
+##### - Date 2020.07.16
+
+* Pass HCA protocol test, fixed tests:
+  - TCI014
+  - TCSTA002
+  - TCI005
+  - *TCF042 (NFC test ignored)*
+
 ##### - Date 2020.07.15
 
 * Add factory reset function by user key1 on [MXKit-Sensor](https://www.mxchip.com/documents) board without reboot.
