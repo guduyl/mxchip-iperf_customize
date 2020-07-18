@@ -1,6 +1,6 @@
 #
 #  UNPUBLISHED PROPRIETARY SOURCE CODE
-#  Copyright (c) 2016 MXCHIP Inc.
+#  Copyright (c) 2020 MXCHIP Inc.
 #
 #  The contents of this file may not be disclosed to third parties, copied or
 #  duplicated in any form, in whole or in part, without the prior written
@@ -19,9 +19,11 @@ GLOBAL_DEFINES +=   DC_MOTOR=MXKIT_D9       \
                     P9813_PIN_CIN=MXKIT_SCL \
                     P9813_PIN_DIN=MXKIT_SDA \
                     EXT_KEY1=MODULE_PIN_14
+# for KV
+GLOBAL_DEFINES +=   KV_CONFIG_MAX_VAL_LEN=1024  # for HCA TCSA002: Set a 1KB software authentication token
 
 # for homekit adk
-GLOBAL_DEFINES += HAP_LOG_LEVEL=3
+GLOBAL_DEFINES +=   HAP_LOG_LEVEL=3
 
 $(NAME)_SOURCES :=  mxos_main.c                                         \
                     $(HOMEKIT_APP_TARGET_DIR)/Main.c                    \

@@ -26,7 +26,7 @@
 #include "AccessorySetup.h"
 
 
-static bool requestedFactoryReset = false;
+volatile bool requestedFactoryReset = false;
 static bool clearPairings = false;
 
 #define PREFERRED_ADVERTISING_INTERVAL (HAPBLEAdvertisingIntervalCreateFromMilliseconds(417.5f))
