@@ -28,9 +28,20 @@ extern "C" {
   * @brief Simple BLE Profile UUID definitions
   * @{
   */
-#define GATT_UUID_PROFILE                    0x6600
-#define GATT_UUID_CHAR_V3_NOTIFY             0x6601
-#define GATT_UUID_CHAR_V2_WRITE              0x6602
+
+#define COMPANY_UUID                            0x0922
+#define GATT_UUID_PROFILE                       COMPANY_UUID
+#define GATT_UUID_CHAR_V3_NOTIFY                0xFED8
+#define GATT_UUID_CHAR_V2_WRITE_NSP             0xFED7
+
+//2Bytes
+#ifndef BLE_LOCAL_NAME_BYTE0
+#define BLE_LOCAL_NAME_BYTE0                          'M'
+#endif
+
+#ifndef BLE_LOCAL_NAME_BYTE1
+#define BLE_LOCAL_NAME_BYTE1                          'X'
+#endif
 
 /** @} End of SIMP_UUIDs */
 

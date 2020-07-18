@@ -41,7 +41,7 @@ static mos_queue_id_t ble_msg = NULL;
 //    'D', 'E', 'V', 'I', 'C', 'E', '_', '0', '0', '0', '0'
 //};
 
-#define ADV_MAC_INDEX               (10)
+#define ADV_MAC_INDEX               (13)
 #define ADV_USER_DATA_INDEX         (16)
 #define ADV_USER_DATA_MAX_LEN       (15)
 
@@ -53,45 +53,37 @@ static uint8_t adv_data[] =
     GAP_ADTYPE_FLAGS, /* type="Flags" */
     GAP_ADTYPE_FLAGS_GENERAL | GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED,
 
+    /* service uuid */
+    0x03, /* length */
+    GAP_ADTYPE_16BIT_COMPLETE,
+    LO_WORD(COMPANY_UUID), HI_WORD(COMPANY_UUID),
+
     /* Local name */
     0x03, /* length */
     GAP_ADTYPE_LOCAL_NAME_COMPLETE,
-    'M', 'X',
+    BLE_LOCAL_NAME_BYTE0, BLE_LOCAL_NAME_BYTE1,
 
     /* Manufacture data */
-    0x14, /* length */
+    0x17, /* length */
     GAP_ADTYPE_MANUFACTURER_SPECIFIC,
-    0x01,                                           //version
-    0x66, 0x55, 0x44, 0x33, 0x22, 0x11,             //default ble mac, the mac address start index: ADV_MAC_INDEX
+    0x33, 0x22, 0x11,             //default ble mac, the mac address start index: ADV_MAC_INDEX
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00  //Reserve
 };
 
 /*============================================================================*
  *                              Functions
  *============================================================================*/
-
-WEAK void ble_get_pid( char *pid_string, uint32_t buff_len )
-{
-    app_log("ble_get_pid not define, error!");
-
-    return;
-}
-
-
 static void ble_set_adv_ble_mac( void )
 {
     uint8_t ble_mac[32] = { 0 };
 
     gap_get_param( GAP_PARAM_BD_ADDR, ble_mac );
 
-    app_log("suning ble mac:%02X%02X%02X%02X%02X%02X", ble_mac[0], ble_mac[1], ble_mac[2], ble_mac[3], ble_mac[4], ble_mac[5]);
+    app_log("suning ble mac:%02X%02X%02X%02X%02X%02X", ble_mac[5], ble_mac[4], ble_mac[3], ble_mac[2], ble_mac[1], ble_mac[0]);
 
-    adv_data[ADV_MAC_INDEX + 0] = ble_mac[5];
-    adv_data[ADV_MAC_INDEX + 1] = ble_mac[4];
-    adv_data[ADV_MAC_INDEX + 2] = ble_mac[3];
-    adv_data[ADV_MAC_INDEX + 3] = ble_mac[2];
-    adv_data[ADV_MAC_INDEX + 4] = ble_mac[1];
-    adv_data[ADV_MAC_INDEX + 5] = ble_mac[0];
+    adv_data[ADV_MAC_INDEX + 0] = ble_mac[2];
+    adv_data[ADV_MAC_INDEX + 1] = ble_mac[1];
+    adv_data[ADV_MAC_INDEX + 2] = ble_mac[0];
 
     return;
 }
@@ -130,7 +122,6 @@ void ble_adv_param_set( void )
 void app_le_gap_init(void)
 {
     /* Device name and device appearance */
-    uint8_t  device_name[GAP_DEVICE_NAME_LEN] = "SN";
     uint16_t appearance = GAP_GATT_APPEARANCE_UNKNOWN;
     uint8_t  slave_init_mtu_req = false;
 
@@ -164,7 +155,6 @@ void app_le_gap_init(void)
     uint16_t auth_sec_req_flags = GAP_AUTHEN_BIT_BONDING_FLAG;
 
     /* Set device name and device appearance */
-    le_set_gap_param(GAP_PARAM_DEVICE_NAME, GAP_DEVICE_NAME_LEN, device_name);
     le_set_gap_param(GAP_PARAM_APPEARANCE, sizeof(appearance), &appearance);
     le_set_gap_param(GAP_PARAM_SLAVE_INIT_GATT_MTU_REQ, sizeof(slave_init_mtu_req), &slave_init_mtu_req);
 

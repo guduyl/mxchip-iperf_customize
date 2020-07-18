@@ -86,8 +86,8 @@ const T_ATTRIB_APPL ble_service_tbl[] =
     {
         ATTRIB_FLAG_VALUE_APPL,                     /* flags */
         {                                          /* type_value */
-            LO_WORD(GATT_UUID_CHAR_V2_WRITE),
-            HI_WORD(GATT_UUID_CHAR_V2_WRITE)
+            LO_WORD(GATT_UUID_CHAR_V2_WRITE_NSP),
+            HI_WORD(GATT_UUID_CHAR_V2_WRITE_NSP)
         },
         0,                                          /* bValueLen */
         NULL,
