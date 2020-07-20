@@ -64,7 +64,7 @@ static uint8_t adv_data[] =
     BLE_LOCAL_NAME_BYTE0, BLE_LOCAL_NAME_BYTE1,
 
     /* Manufacture data */
-    0x17, /* length */
+    0x13, /* length */
     GAP_ADTYPE_MANUFACTURER_SPECIFIC,
     0x33, 0x22, 0x11,             //default ble mac, the mac address start index: ADV_MAC_INDEX
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00  //Reserve

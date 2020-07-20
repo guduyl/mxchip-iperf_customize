@@ -70,7 +70,6 @@ const T_ATTRIB_APPL ble_service_tbl[] =
         (GATT_PERM_READ | GATT_PERM_WRITE)          /* permissions */
     },
 
-    /* <<Characteristic>> demo for write */
     {
         ATTRIB_FLAG_VALUE_INCL,                     /* flags */
         {                                           /* type_value */
