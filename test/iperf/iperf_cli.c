@@ -47,7 +47,16 @@ void iperf_Command( int argc, char **argv );
 static void ap_command(int argc, char **argv);
 static void conn_command(int argc, char **argv);
 
+static void ce_command(int argc, char **argv) 
+{
+#ifdef CONFIG_MX1290
+    wext_set_adaptivity(1);
+    wifi_set_country(10);   
+#endif
+}
+
 mcli_cmd_t iperf_test_message_cmd[] = {
+    {"ce", "enable CE test", ce_command}, 
     {"ap", "<SSID> [<key>] start soft-AP mode", ap_command},
     {"conn", "<SSID> [<key>] connect to an AP", conn_command},
     { "iperf", "iperf test", iperf_Command },
