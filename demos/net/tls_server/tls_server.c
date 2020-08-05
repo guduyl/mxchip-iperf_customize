@@ -179,15 +179,7 @@ void tls_server_thread( void *arg )
                 strcpy( client_ip_str, inet_ntoa( client_addr.sin_addr ) );
                 tls_server_log( "TLS Client %s:%d connected, fd: %d",
                                 client_ip_str, client_addr.sin_port, client_fd );
-                if ( kNoErr != mxos_rtos_create_thread( NULL, MOS_APPLICATION_PRIORITY,
-                                                        "TLS Clients",
-                                                        tls_client_thread,
-                                                        0x2000,
-                                                        (uint32_t)client_ssl ) )
-                {
-                    SocketClose( &client_fd );
-                    mtls_close( client_ssl );
-                }
+                mos_thread_new(MOS_APPLICATION_PRIORITY, "TLS_client", tls_client_thread, 0x2000, (uint32_t)client_ssl );
 
             }else{
                 SocketClose( &client_fd );

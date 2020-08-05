@@ -44,7 +44,7 @@
 
 /************************************************************************
  * Enable wlan connection, start easylink configuration if no wlan settings are existed */
-#define MXOS_WLAN_CONNECTION_ENABLE
+#define MXOS_WLAN_CONNECTION_ENABLE                     1
 
 #define MXOS_WLAN_CONFIG_MODE CONFIG_MODE_EASYLINK_WITH_SOFTAP
 
@@ -59,20 +59,20 @@
 
 /************************************************************************
  * Command line interface */
-#define MXOS_CLI_ENABLE  
+#define MXOS_CLI_ENABLE                                  1
 
 /************************************************************************
  * Start a system monitor daemon, application can register some monitor  
  * points, If one of these points is not executed in a predefined period, 
  * a watchdog reset will occur. */
-#define MXOS_SYSTEM_MONITOR_ENABLE
+#define MXOS_SYSTEM_MONITOR_ENABLE                      1
 
 /************************************************************************
  * Add service _easylink._tcp._local. for discovery */
-#define MXOS_SYSTEM_DISCOVERY_ENABLE  
+#define MXOS_SYSTEM_DISCOVERY_ENABLE                    1
 
 /************************************************************************
  * MiCO TCP server used for configuration and ota. */
-#define MXOS_CONFIG_SERVER_ENABLE 
+#define MXOS_CONFIG_SERVER_ENABLE                       1
 #define MXOS_CONFIG_SERVER_PORT    8000
 
