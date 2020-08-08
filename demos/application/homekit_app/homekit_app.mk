@@ -15,7 +15,7 @@ HOMEKIT_APP_TARGET_DIR := Lightbulb
 GLOBAL_INCLUDES += $(HOMEKIT_APP_TARGET_DIR)
 
 # IO defines for MiCOKit-EXT board
-GLOBAL_DEFINES +=   DC_MOTOR=MXKIT_D9       \
+GLOBAL_DEFINES +=   DC_MOTOR_PIN=MXKIT_D9       \
                     P9813_PIN_CIN=MXKIT_SCL \
                     P9813_PIN_DIN=MXKIT_SDA \
                     EXT_KEY1=MODULE_PIN_14
