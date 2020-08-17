@@ -15,7 +15,7 @@
  ******************************************************************************
  */
 
-#include "mico.h"
+#include "mxos.h"
 #include "mxos_app_define.h"
 #include "HomeKit.h"
 #include "HomeKitPairList.h"
