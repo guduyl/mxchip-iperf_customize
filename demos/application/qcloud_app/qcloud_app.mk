@@ -9,16 +9,23 @@
 
 NAME := App_qcloud_light
 
-# IO define for dc motor & rgb led on MiCOKit-EXT board
-GLOBAL_DEFINES +=   DC_MOTOR_PIN=MXKIT_D9		\
-                    P9813_PIN_CIN=MXKIT_SCL 	\
-                    P9813_PIN_DIN=MXKIT_SDA 	\
-                    EXT_KEY1=MODULE_PIN_14
+# IO define for rgb led on MiCOKit-EXT board
+GLOBAL_DEFINES +=   P9813_PIN_CIN=MXKIT_SCL		\
+                    P9813_PIN_DIN=MXKIT_SDA
 
 GLOBAL_INCLUDES += .
 
 $(NAME)_SOURCES :=  mxos_main.c
 
-$(NAME)_COMPONENTS :=   lib_qcloud							\
-                        libraries/drivers/motor/dc_motor	\
+$(NAME)_COMPONENTS :=   libraries/protocols/SNTP		\
+						lib_qcloud						\
                         libraries/drivers/rgb_led/P9813
+
+# add qcloud sample code
+# QCLOUD_SAMPLE_NAME := data_template
+QCLOUD_SAMPLE_NAME := scenarized
+
+QCLOUD_SAMPLE_DIR := samples/$(QCLOUD_SAMPLE_NAME)
+include demos/application/qcloud_app/$(QCLOUD_SAMPLE_DIR)/$(QCLOUD_SAMPLE_NAME).mk
+$(NAME)_INCLUDES += $(QCLOUD_SAMPLE_INCLUDES)
+$(NAME)_SOURCES += $(QCLOUD_SAMPLE_SOURCES)

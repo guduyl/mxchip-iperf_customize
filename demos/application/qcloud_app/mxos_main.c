@@ -31,22 +31,26 @@
  */
 
 #include "mxos.h"
-#include "dc_motor.h"
+#include "sntp.h"
 #include "rgb_led.h"
 
 #define app_log(M, ...) MXOS_LOG(CONFIG_APP_DEBUG, "APP", M, ##__VA_ARGS__)
 
 static mos_semphr_id_t wifi_wait_sem = NULL;
+static mos_semphr_id_t time_wait_sem = NULL;
+
+extern int qcloud_main(int argc, char **argv);
+
+static void ntp_time_synced_fun(void)
+{
+  app_log("NTP sync time successfuly.");
+  mos_semphr_release(time_wait_sem);
+}
 
 static int board_init(void)
 {
     rgb_led_init();
     rgb_led_open(0, 10, 0);
-
-    dc_motor_init();
-    dc_motor_set(1);
-    mos_msleep(500);
-    dc_motor_set(0);
 
     return 0;
 }
@@ -69,15 +73,23 @@ static void micoNotify_WifiStatusHandler( WiFiEvent status, void* const inContex
 /* when wifi connected success,create homekit server */
 static void qcloud_app_thread(void *arg)
 {
+    merr_t err;
 	(void)arg;
 
-	/* start qcloud app */
-    //TODO qcloud demo
-    while(1){
-        app_log("qcloud ...");
-        mos_sleep(1);
-    }
+    /* NTP time sync */
+    time_wait_sem = mos_semphr_new(1);
+    require( NULL != time_wait_sem, exit );
 
+    err = sntp_start_auto_time_sync(10 * 1000, ntp_time_synced_fun);
+    require_noerr( err, exit );
+    app_log("network time sync ...");
+    (void)mos_semphr_acquire(time_wait_sem, MOS_WAIT_FOREVER);
+
+	/* start qcloud app */
+    app_log("qcloud app start ...");
+    (void)qcloud_main(0, NULL);
+
+exit:
     app_log("*** qcloud app thread exit !!!");
 	mos_thread_delete( NULL );
 }
@@ -89,19 +101,20 @@ int main(void)
 {
     merr_t err = kNoErr;
 
+    /* board hardware init */
+    (void)board_init();
+
     wifi_wait_sem = mos_semphr_new(1);
     require( NULL != wifi_wait_sem, exit );
 
-    /*Register user function for MiCO nitification: WiFi status changed */
+    /*Register user function for MXOS notification: WiFi status changed */
     err = mxos_system_notify_register( mxos_notify_WIFI_STATUS_CHANGED,
                                        (void *) micoNotify_WifiStatusHandler, NULL );
     require_noerr( err, exit );
 
-    /* Start MiCO system functions according to mxos_config.h */
+    /* Start MXOS system functions according to mxos_config.h */
     err = mxos_system_init(  );
     require_noerr( err, exit );
-
-    board_init();
 
     /* Wait for wlan connection */
     mos_semphr_acquire( wifi_wait_sem, MOS_WAIT_FOREVER );
@@ -113,8 +126,6 @@ int main(void)
     }
 
     exit:
-    if ( wifi_wait_sem != NULL )
-        mos_semphr_delete( wifi_wait_sem );
     mos_thread_delete( NULL );
     return err;
 }
