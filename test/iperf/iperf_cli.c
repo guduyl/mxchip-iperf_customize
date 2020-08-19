@@ -51,7 +51,10 @@ static void ce_command(int argc, char **argv)
 {
 #ifdef CONFIG_MX1290
     wext_set_adaptivity(1);
-    wifi_set_country(10);   
+    wifi_set_country(10);  
+    wifi_off();
+    mos_msleep(20);
+    wifi_on(1);
 #endif
 }
 
