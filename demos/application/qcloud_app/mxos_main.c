@@ -50,7 +50,7 @@ static void ntp_time_synced_fun(void)
 static int board_init(void)
 {
     rgb_led_init();
-    rgb_led_open(0, 10, 0);
+    rgb_led_open(0, 0, 0);
 
     return 0;
 }

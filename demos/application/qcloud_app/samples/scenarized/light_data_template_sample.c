@@ -23,6 +23,12 @@
 #include "qcloud_iot_import.h"
 #include "utils_timer.h"
 
+#include "rgb_led.h"
+
+static int rgb_red_val = 0;
+static int rgb_green_val = 0;
+static int rgb_blue_val = 0;
+
 #ifdef AUTH_MODE_CERT
 static char sg_cert_file[PATH_MAX + 1];  // full path of device cert file
 static char sg_key_file[PATH_MAX + 1];   // full path of device key file
@@ -495,14 +501,23 @@ static void deal_down_stream_user_logic(void *client, ProductDataDefine *light)
         case eCOLOR_RED:
             ansi_color      = ANSI_COLOR_RED;
             ansi_color_name = " RED ";
+            rgb_red_val = 120;
+            rgb_green_val = 0;
+            rgb_blue_val = 0;
             break;
         case eCOLOR_GREEN:
             ansi_color      = ANSI_COLOR_GREEN;
             ansi_color_name = "GREEN";
+            rgb_red_val = 0;
+            rgb_green_val = 120;
+            rgb_blue_val = 0;
             break;
         case eCOLOR_BLUE:
             ansi_color      = ANSI_COLOR_BLUE;
             ansi_color_name = " BLUE";
+            rgb_red_val = 0;
+            rgb_green_val = 0;
+            rgb_blue_val = 120;
             break;
         default:
             ansi_color      = ANSI_COLOR_YELLOW;
@@ -517,14 +532,21 @@ static void deal_down_stream_user_logic(void *client, ProductDataDefine *light)
         brightness_bar[i] = '-';
     }
 
+    rgb_red_val = rgb_red_val > 0 ? (120 * light->m_brightness) / 100 : 0;
+    rgb_green_val = rgb_green_val > 0 ? (120 * light->m_brightness) / 100 : 0;
+    rgb_blue_val = rgb_blue_val > 0 ? (120 * light->m_brightness) / 100: 0;
+    HAL_Printf("--> set brightness r=%d, g=%d, b=%d", rgb_red_val, rgb_green_val, rgb_blue_val);
+
     if (light->m_light_switch) {
         /* light is on , show with the properties*/
         HAL_Printf("%s[  lighting  ]|[color:%s]|[brightness:%s]|[%s]\n" ANSI_COLOR_RESET, ansi_color, ansi_color_name,
                    brightness_bar, light->m_name);
+        rgb_led_open(rgb_red_val, rgb_green_val, rgb_blue_val);
     } else {
         /* light is off */
         HAL_Printf(ANSI_COLOR_YELLOW "[  light is off ]|[color:%s]|[brightness:%s]|[%s]\n" ANSI_COLOR_RESET,
                    ansi_color_name, brightness_bar, light->m_name);
+        rgb_led_close();
     }
 
     if (eCHANGED == get_property_state(&light->m_light_switch)) {
