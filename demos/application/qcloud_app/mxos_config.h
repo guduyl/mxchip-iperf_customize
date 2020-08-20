@@ -31,7 +31,7 @@
 //#define MXOS_DEFAULT_APPLICATION_STACK_SIZE (2000)
 
 // Wi-Fi config
-#define WIFI_CONFIG_MODE    WIFI_CONFIG_MODE_NONE
+#define WIFI_CONFIG_MODE    WIFI_CONFIG_MODE_AWS
 #define EasyLink_Needs_Reboot
 
 #endif
