@@ -33,6 +33,7 @@
 #include "mxos.h"
 #include "sntp.h"
 #include "rgb_led.h"
+#include "qcloud_wifi_config.h"
 
 #define app_log(M, ...) MXOS_LOG(CONFIG_APP_DEBUG, "APP", M, ##__VA_ARGS__)
 
@@ -101,6 +102,11 @@ int main(void)
 {
     merr_t err = kNoErr;
 
+    app_log("====================== QCloudAPP ====================");
+    app_log("App info: %s, %s", APP_INFO, FIRMWARE_REVISION);
+    app_log("Build at: %s, %s", __TIME__, __DATE__);
+    app_log("====================== QCloudAPP ====================");
+
     /* board hardware init */
     (void)board_init();
 
@@ -115,6 +121,40 @@ int main(void)
     /* Start MXOS system functions according to mxos_config.h */
     err = mxos_system_init(  );
     require_noerr( err, exit );
+
+#if CONFIG_WIFI_SOFTAP_ENABLED
+    if(mxos_system_context_get( )->mxos_config.configured == unConfigured || \
+        (mxos_system_context_get()->mxos_config.configured == wLanUnConfigured) ){
+        app_log("No wifi configuration, Starting wifi configuration mode...");
+        bool wifi_connected = false;
+        /* to use WiFi config and device binding with Wechat mini program */
+        int wifi_config_state;
+        int ret = start_softAP("MXCHIP-SAP", "12345678", 6);
+        if (ret) {
+            app_log("start wifi config failed: %d", ret);
+        } else {
+            /* max waiting: 150 * 2000ms */
+            int wait_cnt = 150;
+            do {
+                app_log("waiting for wifi config result...");
+                mos_msleep(2000);            
+                wifi_config_state = query_wifi_config_state();
+            } while (wifi_config_state == WIFI_CONFIG_GOING_ON && wait_cnt--);
+        }
+
+        wifi_connected = is_wifi_config_successful();
+        if (!wifi_connected) {
+            app_log("wifi config failed!");
+            // setup a softAP to upload log to mini program
+            start_log_softAP();
+        } else {
+            mos_semphr_release( wifi_wait_sem );
+        }
+    }else{
+        app_log("Available wifi configuration. Starting Wi-Fi connection...");
+        system_connect_wifi_fast( system_context( ) );
+    }
+#endif
 
     /* Wait for wlan connection */
     mos_semphr_acquire( wifi_wait_sem, MOS_WAIT_FOREVER );
