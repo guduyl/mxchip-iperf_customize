@@ -11,4 +11,5 @@
 #ifndef __MXOS_CONFIG_H
 #define __MXOS_CONFIG_H
 
+#define MWIFI_EAP_ENABLE 1
 #endif
