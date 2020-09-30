@@ -46,8 +46,9 @@
 /************************************************************************
  * IPV6 */
 //#define MXOS_CONFIG_IPV6                          1
+
 #define CONFIG_MDNS_DEBUG            MXOS_DEBUG_ON
 #define MXOS_WLAN_FORCE_OTA_ENABLE               0
-#define CONFIG_FORCTOTA_DEBUG        MXOS_DEBUG_ON
+#define CONFIG_FORETOTA_DEBUG        MXOS_DEBUG_ON
 
 #endif
