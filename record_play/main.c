@@ -51,12 +51,15 @@ int main( void )
     uint8_t *psbuf;
     uint32_t len;
     
+    /* Start mxos system functions according to mxos_config.h*/
+	err = mxos_system_init();
+	require_noerr(err, exit);
+
     audio_init();
-    
-    player_log("record start");
+    player_log("audio_inited");
     
     app_init_psram(); // enable PSram  
-    
+
     player_log("record start");
 
     while(1) {
@@ -65,13 +68,15 @@ int main( void )
         
         player_log("start recored %d bytes, buf=%p", len, psbuf);
         reocrd(psbuf, len);
+
         player_log("read %d bytes, start play", len);
         play(psbuf, len);
         player_log("play done");
         
         Psram_reserve_free(psbuf);
     }
+
+exit:
     mos_thread_delete( NULL );
     return err;
 }
-

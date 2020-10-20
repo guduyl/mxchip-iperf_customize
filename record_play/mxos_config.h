@@ -11,17 +11,24 @@
 #ifndef __MXOS_CONFIG_H__
 #define __MXOS_CONFIG_H__
 
-#define FIRMWARE_REVISION   "MXPLAYER"
+#define APP_INFO            "MXOS Demo(Audio)"
+#define FIRMWARE_REVISION   "V1.0.0"
 #define MANUFACTURER        "MXCHIP Inc."
-#define SERIAL_NUMBER       "0000.0000.AD01"
-#define PROTOCOL            "com.mxchip.spp"
+#define SERIAL_NUMBER       "20201019"
+#define PROTOCOL            "com.mxchip.demo"
 
-#define MXOS_QUALITY_CONTROL_ENABLE 1
+/************************************************************************
+ * Application thread stack size */
+#define MXOS_DEFAULT_APPLICATION_STACK_SIZE         (1500)
 
-#define SPI_CS_PIN                                  MODULE_PIN_26
-#define SPI_USE_SPI                                 SPI_1
+#define MXOS_CLI_ENABLE                 (1)
+#define MXOS_SYSTEM_MONITOR_ENABLE      (1) // set 0 to disable WDG for debug
 
-/* enable buffer for mxplayer */
-#define MXPLAYER_ENABLE_BUFFER 1
-#define MXPLAYER_BUFFER_SIZE   2000
+#define MXOS_WLAN_CONNECTION_ENABLE     (0)
+#define MXOS_CONFIG_EASYLINK_BTN_ENABLE (1)
+#define EasyLink_Needs_Reboot
+
+#define MXOS_CONFIG_SERVER_ENABLE       (0)
+#define MXOS_SYSTEM_DISCOVERY_ENABLE    (0)
+
 #endif
