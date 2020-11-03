@@ -4,12 +4,15 @@
 
 #define player_log(M, ...) custom_log("player", M, ##__VA_ARGS__)
 
+// #define TEST_PLAY_IMMEDIATELY
+
 /* callback from audio dac, notify all pcm is played*/
 void audio_dac_empty(void)
 {
     //player_log("DAC real empty");
 }
 
+#ifndef TEST_PLAY_IMMEDIATELY
 static void reocrd(uint8_t *buf, int len)
 {
     int offset = 0, ret;
@@ -18,6 +21,7 @@ static void reocrd(uint8_t *buf, int len)
     player_log("record start");
     audio_adc_channel_set(1); // 1 for mono, 2 for stereo
     audio_adc_samplerate_set(16000);
+    audio_adc_gain_set(0x5f, 0);  // set mic gain
     
     while(offset < len) {
         player_log("offset %d, left %d", offset, len-offset);
@@ -44,6 +48,7 @@ static void play(uint8_t *buf, int len)
     }
     audio_dac_stop();
 }
+#endif /* !TEST_PLAY_IMMEDIATELY */
 
 int main( void )
 {
@@ -62,6 +67,8 @@ int main( void )
 
     player_log("record start");
 
+#ifndef TEST_PLAY_IMMEDIATELY
+    /* record 1MB data then play */
     while(1) {
         len = 1024*1024;
         psbuf = Psram_reserve_malloc(len);
@@ -75,6 +82,31 @@ int main( void )
         
         Psram_reserve_free(psbuf);
     }
+#else
+    /* record and play */
+    audio_dac_start();
+    audio_dac_channel_set(2); // 1 for mono, 2 for stereo
+    audio_dac_samplerate_set(16000);
+    audio_dac_volume_set(100); // volume from 0 to 100
+
+    audio_adc_start();
+    player_log("record start");
+    audio_adc_channel_set(2); // 1 for mono(left), 2 for stereo
+    audio_adc_samplerate_set(16000);
+    audio_adc_gain_set(0x50, 0);  // set mic gain
+
+    len = 1024;
+    psbuf = Psram_reserve_malloc(len);
+
+    while(1){
+        len = audio_adc_read(psbuf, len);
+        if(len){
+            audio_dac_write(psbuf, len);
+        }
+    }
+
+    Psram_reserve_free(psbuf);
+#endif /* TEST_PLAY_IMMEDIATELY */
 
 exit:
     mos_thread_delete( NULL );
