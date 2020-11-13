@@ -83,7 +83,7 @@ int main(void)
 		memset(read_buf, 0, sizeof(read_buf));
 		app_log("offset: 0x%lx read", read_offset);
 		err = mhal_flash_read(TEST_PARTITION, &read_offset, read_buf, sizeof(read_buf));
-		require_noerr_action(err, exit, app_log("write offset: 0x%lx error!!", read_offset));
+		require_noerr_action(err, exit, app_log("read offset: 0x%lx error!!", read_offset));
 
 		/* data check */
 		if (0 == memcmp(write_buf, read_buf, sizeof(write_buf))) {
